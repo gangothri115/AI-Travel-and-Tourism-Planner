@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
           let current={}; try{current=JSON.parse(sessionStorage.getItem("tripRequirements")||"{}")}catch{}
           const requirements={...current,destination,places,selected_places:places};
           sessionStorage.setItem("tripRequirements",JSON.stringify(requirements));
-          localStorage.setItem("selectedTripPlaces",JSON.stringify(places));
+          // Preserve all saved destinations and their places.
           sessionStorage.removeItem("tripHistorySavedForCurrentPlan");
           return requirements;
         };
