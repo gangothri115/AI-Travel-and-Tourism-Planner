@@ -1,0 +1,38 @@
+AI TRAVEL TOURISM — PLACES IMAGE + AUTO-REFRESH FIX
+
+This ZIP contains ONLY:
+  static/js/places.js
+  static/js/planning.js
+
+It contains no enclosing project folder.
+
+INSTALL:
+1. Stop Flask (Ctrl+C).
+2. In Terminal:
+   cd ~/Desktop/AI_Travel_Tourism
+   cp static/js/places.js static/js/places.js.backup
+   cp static/js/planning.js static/js/planning.js.backup
+
+3. Extract the ZIP directly into the existing project folder:
+   unzip -o ~/Downloads/AI_Travel_Tourism_Places_Refresh_Fix.zip -d ~/Desktop/AI_Travel_Tourism
+
+4. Restart:
+   cd ~/Desktop/AI_Travel_Tourism
+   source venv/bin/activate
+   python app.py
+
+5. In Chrome press Ctrl+Shift+R.
+
+WHAT IT DOES:
+- Searches OSM and Wikipedia together and MERGES results instead of letting the
+  first, image-less offline result win.
+- Enriches matching place cards with Wikipedia thumbnails/descriptions.
+- When Destination is edited in Trip Summary, immediately fetches places for
+  the new destination and ignores late responses from the old destination.
+- Uses a neutral card placeholder if a source has no image, rather than a large
+  broken landscape emoji.
+
+NOTE:
+Some attractions do not have freely available images in the source providers.
+Those cards will use the designed placeholder. No app can guarantee third-party
+image or place-provider uptime.

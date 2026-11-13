@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}My Travel Profile | AI Travel & Tourism{% endblock %}
+{% block extra_css %}
+<style>
+.profile-page{width:min(1440px,calc(100% - 40px));margin:36px auto 55px}
+.profile-hero,.profile-panel{background:#fff;border:1px solid #e3eaf4;border-radius:22px;padding:26px;margin-bottom:24px;box-shadow:0 8px 28px rgba(25,40,70,.055)}
+.profile-hero{background:linear-gradient(120deg,#edf3ff,#fff 60%,#f4efff)}
+.profile-hero h1{margin:0 0 8px;color:#183b65;font-size:30px}
+.profile-hero p{margin:0;color:#65758b}
+.profile-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:20px}
+.profile-stat{background:#f4f8ff;border:0;border-radius:14px;padding:16px;text-align:left}
+.profile-stat strong{display:block;font-size:25px;color:#1769aa}
+.profile-stat span{color:#607086;font-size:13px}
+.profile-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.profile-actions a,.profile-actions button{border:0;border-radius:10px;padding:11px 16px;background:#1769aa;color:white;text-decoration:none;cursor:pointer;font-weight:650}
+.profile-panel h2{margin:0 0 20px;color:#183b65;font-size:24px}
+.profile-empty{color:#718096;padding:15px 0}
+#profileSelectedPanel{width:100%}
+#profileSelectedList{display:block;width:100%}
+.profile-destination-group{display:block;width:100%;box-sizing:border-box;margin:18px 0;padding:0;border:1px solid #dfe7f3;border-radius:20px;background:#fff;overflow:hidden;box-shadow:0 8px 24px rgba(25,45,80,.055)}
+.profile-destination-toggle{display:flex;width:100%;align-items:center;justify-content:space-between;gap:18px;padding:22px 25px;border:0;background:linear-gradient(100deg,#f5f8ff,#fff);text-align:left;cursor:pointer}
+.profile-destination-title{display:grid;gap:5px}
+.profile-destination-title small{font-size:10px;letter-spacing:.13em;font-weight:800;color:#7488a5}
+.profile-destination-title strong{font-size:23px;color:#183b65;text-transform:capitalize}
+.profile-destination-title em{font-size:13px;font-style:normal;color:#647892}
+.profile-expand-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:#eaf1ff;color:#315fe4;font-size:24px;flex:0 0 auto}
+.profile-destination-content{padding:20px 22px 22px}
+.profile-destination-content[hidden]{display:none}
+.profile-destination-places{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;width:100%}
+.profile-selected-place{min-width:0;border:1px solid #e1e8f2;border-radius:17px;overflow:hidden;background:#fff;box-shadow:0 5px 18px rgba(30,55,90,.07)}
+.profile-selected-image{height:215px;background:linear-gradient(135deg,#eaf0fb,#dfe8f6);display:grid;place-items:center;overflow:hidden}
+.profile-selected-image img{width:100%;height:100%;object-fit:cover;display:block}
+.profile-selected-image span{font-size:36px}
+.profile-selected-copy{padding:16px}
+.profile-selected-copy h3{margin:0 0 7px;color:#203f68;font-size:18px;line-height:1.35}
+.profile-selected-copy p{margin:0;color:#6b7d95;font-size:13px;min-height:18px}
+.profile-place-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.profile-place-actions button{padding:9px 14px;border:1px solid #d8e3f2;border-radius:9px;background:#f3f7ff;color:#315b9b;font-weight:650;cursor:pointer}
+.profile-place-actions .remove-place{background:#fff7f7;color:#b4233c;border-color:#f0cbd2}
+.profile-destination-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:20px;padding-top:17px;border-top:1px solid #edf1f7;color:#687b95;font-size:13px}
+.profile-trip-buttons{display:flex;gap:10px;flex-wrap:wrap}
+.profile-plan-destination,.profile-add-destination,.profile-remove-destination{border:0;border-radius:11px;padding:12px 18px;font-weight:700;cursor:pointer}
+.profile-plan-destination{background:linear-gradient(110deg,#2563eb,#6545e8);color:white;box-shadow:0 6px 14px rgba(60,85,220,.18)}
+.profile-add-destination{background:#edf4ff;color:#2458a6;border:1px solid #d5e3fb}
+.profile-remove-destination{background:#fff6f6;color:#b4233c;border:1px solid #f0cbd2}
+.profile-plan-destination:hover,.profile-add-destination:hover,.profile-remove-destination:hover{filter:brightness(.97);transform:translateY(-1px)}
+@media(max-width:650px){.profile-page{width:calc(100% - 22px)}.profile-destination-toggle{padding:17px}.profile-destination-content{padding:14px}.profile-destination-places{grid-template-columns:1fr}.profile-selected-image{height:220px}.profile-destination-footer{align-items:stretch;flex-direction:column}.profile-trip-buttons button{flex:1}}
+</style>
+{% endblock %}
+{% block content %}
+<section class="profile-page">
+  <header class="profile-hero">
+    <h1>👤 My Travel Profile</h1>
+    <p>Your saved trips and selected places on this device.</p>
+    <div class="profile-stats">
+      <button class="profile-stat stat-link" type="button" data-target="profileSelectedPanel"><strong id="profileSelectedCount">0</strong><span>Places added · View</span></button>
+    </div>
+    <div class="profile-actions">
+      <button type="button" id="profileNewTrip">＋ New trip</button>
+      <button type="button" id="clearTripHistory">Clear trip history</button>
+    </div>
+  </header>
+  <section class="profile-panel" id="profileSelectedPanel">
+    <h2>📍 Places added to trips</h2>
+    <div id="profileSelectedList"><p class="profile-empty">No places added yet.</p></div>
+  </section>
+</section>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/profile.js') }}?v=40" defer></script>
+{% endblock %}

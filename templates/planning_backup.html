@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}
+Trip Planning | AI Travel & Tourism
+{% endblock %}
+
+{% block content %}
+
+<section class="planning-page">
+
+    <div class="planning-header">
+
+        <a href="javascript:history.back()" class="back-button">
+            ← Back
+        </a>
+
+        <h1>
+            🗺️ Your AI Travel Plan
+        </h1>
+
+        <p>
+            Your personalized journey will appear here.
+        </p>
+
+    </div>
+
+
+   <div class="trip-summary">
+
+    <!-- FROM -->
+
+    <div class="summary-card">
+
+        <span>📍</span>
+
+        <div>
+
+            <small>From</small>
+
+            <strong id="fromLocation">
+                Not specified
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- DESTINATION -->
+
+    <div class="summary-card">
+
+        <span>🎯</span>
+
+        <div>
+
+            <small>Destination</small>
+
+            <strong id="destination">
+                Not specified
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- DURATION -->
+
+    <div class="summary-card">
+
+        <span>📅</span>
+
+        <div>
+
+            <small>Duration</small>
+
+            <strong id="duration">
+                Not specified
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- TRANSPORT -->
+
+    <div class="summary-card">
+
+        <span>🚗</span>
+
+        <div>
+
+            <small>Transport</small>
+
+            <strong id="transport">
+                Not specified
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- BUDGET — NEW -->
+
+    <div class="summary-card">
+
+        <span>💰</span>
+
+        <div>
+
+            <small>Budget</small>
+
+            <strong id="budget">
+                Not specified
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- TRAVELLERS — NEW -->
+
+    <div class="summary-card">
+
+        <span>👥</span>
+
+        <div>
+
+            <small>Travellers</small>
+
+            <strong id="travellers">
+                Not specified
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+    <!-- RESULTS -->
+
+    <section class="travel-results">
+
+        <h2>
+            ✨ Places You Can Explore
+        </h2>
+
+        <p>
+            After you select your destination, real travel
+            information will appear here.
+        </p>
+
+
+        <div id="placesContainer" class="results-grid">
+
+            <div class="empty-state">
+
+                <span>🌍</span>
+
+                <h3>
+                    Your travel recommendations will appear here
+                </h3>
+
+                <p>
+                    Places, routes, hotels, restaurants,
+                    weather and activities will be loaded here.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</section>
+
+<script>
+
+    const tripData =
+        JSON.parse(
+            sessionStorage.getItem(
+                "tripRequirements"
+            ) || "{}"
+        );
+
+
+    if (tripData.from_location) {
+
+        document.getElementById(
+            "fromLocation"
+        ).textContent =
+            tripData.from_location;
+    }
+
+
+    if (tripData.destination) {
+
+        document.getElementById(
+            "destination"
+        ).textContent =
+            tripData.destination;
+    }
+
+
+    if (tripData.days) {
+
+        document.getElementById(
+            "duration"
+        ).textContent =
+            tripData.days + " Days";
+    }
+
+
+    if (tripData.transport) {
+
+        document.getElementById(
+            "transport"
+        ).textContent =
+            tripData.transport;
+    }
+
+
+    /* NEW: BUDGET */
+
+    if (tripData.budget) {
+
+        document.getElementById(
+            "budget"
+        ).textContent =
+            "₹" +
+            tripData.budget.toLocaleString("en-IN");
+    }
+
+
+    /* NEW: TRAVELLERS */
+
+    if (tripData.travellers) {
+
+        document.getElementById(
+            "travellers"
+        ).textContent =
+            tripData.travellers;
+    }
+
+</script>
+
+{% endblock %}

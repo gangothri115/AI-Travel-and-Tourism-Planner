@@ -1,0 +1,18 @@
+PHOTO THUMBNAIL FIX
+
+Why the previous display looked wrong:
+The cards had no matching image URL. The fallback printed the word “Discover” and the attraction name, but the fallback was not styled as a thumbnail. This patch fixes both problems.
+
+Changes:
+- Uses Geoapify/Wikipedia image URLs when supplied.
+- When missing, searches Wikimedia Commons for an image matching the attraction and destination.
+- Displays photographs as fixed 190px object-fit: cover thumbnails.
+- Uses a small, fixed-size photo-unavailable state rather than giant text.
+- Keeps famous/scenic categories and existing card actions.
+
+Install:
+1. Back up static/js/places.js and static/css/places.css.
+2. Extract this ZIP into the existing project root, preserving folders.
+3. Restart Flask and hard-refresh Chrome (Ctrl+Shift+R).
+
+Photo matching is best-effort: Wikimedia may not have an accurately matching photograph for every mapped place. The code does not fabricate or deliberately substitute unrelated images.

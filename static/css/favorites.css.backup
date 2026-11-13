@@ -1,0 +1,785 @@
+/* =========================================================
+   AI TRAVEL
+   FAVORITES PAGE
+   PROFESSIONAL LIGHT / DARK DESIGN
+   ========================================================= */
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.favorites-page {
+
+    min-height: calc(100vh - 150px);
+
+    padding: 38px 20px 70px;
+
+    background: #f7f9fc;
+
+    transition:
+        background 0.25s ease,
+        color 0.25s ease;
+}
+
+
+.favorites-wrapper {
+
+    width: 100%;
+
+    max-width: 1080px;
+
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   BACK BUTTON
+   ========================================================= */
+
+.favorites-page .back-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    margin-bottom: 28px;
+
+    color: #475569;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition: 0.2s ease;
+}
+
+
+.favorites-page .back-button:hover {
+
+    color: #0f172a;
+
+    transform: translateX(-3px);
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.favorites-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+    margin-bottom: 32px;
+}
+
+
+/* Elegant heart container */
+
+.favorites-header-icon {
+
+    width: 58px;
+
+    height: 58px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    color: #e11d48;
+
+    font-size: 27px;
+
+    box-shadow:
+        0 6px 18px rgba(15, 23, 42, 0.06);
+
+    transition: 0.25s ease;
+}
+
+
+.favorites-header h1 {
+
+    margin: 0;
+
+    color: #172033;
+
+    font-size: 31px;
+
+    font-weight: 750;
+
+    letter-spacing: -0.5px;
+}
+
+
+.favorites-header p {
+
+    margin: 5px 0 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   MAIN FAVORITES PANEL
+   ========================================================= */
+
+.favorites-container {
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 20px;
+
+    padding: 30px;
+
+    box-shadow:
+        0 8px 28px rgba(15, 23, 42, 0.055);
+
+    transition: 0.25s ease;
+}
+
+
+/* =========================================================
+   SECTION TITLE
+   ========================================================= */
+
+.favorites-section-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 24px;
+}
+
+
+.section-heart {
+
+    color: #e11d48;
+
+    font-size: 20px;
+}
+
+
+.favorites-section-title h2 {
+
+    margin: 0;
+
+    color: #172033;
+
+    font-size: 21px;
+
+    font-weight: 700;
+}
+
+
+.favorites-section-title p {
+
+    margin: 4px 0 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   FAVORITES GRID
+   ========================================================= */
+
+.favorites-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+
+/* =========================================================
+   FAVORITE CARD
+   ========================================================= */
+
+.favorite-card {
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 15px;
+
+    overflow: hidden;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.favorite-card:hover {
+
+    transform: translateY(-3px);
+
+    border-color: #cbd5e1;
+
+    box-shadow:
+        0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+
+/* =========================================================
+   CARD CONTENT
+   ========================================================= */
+
+.favorite-card-content {
+
+    min-height: 82px;
+
+    padding: 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+}
+
+
+/* Place name + location icon */
+
+.favorite-place-info {
+
+    min-width: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+}
+
+
+.favorite-location-icon {
+
+    width: 34px;
+
+    height: 34px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #fff1f2;
+
+    font-size: 16px;
+}
+
+
+.favorite-card h3 {
+
+    margin: 0;
+
+    color: #172033;
+
+    font-size: 16px;
+
+    font-weight: 650;
+
+    line-height: 1.4;
+
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   HEART BUTTON
+   ========================================================= */
+
+.favorite-remove {
+
+    width: 40px;
+
+    height: 40px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    border: 1px solid #fecdd3;
+
+    background: #fff7f8;
+
+    color: #e11d48;
+
+    font-size: 19px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.favorite-remove:hover {
+
+    background: #ffe4e8;
+
+    transform: scale(1.07);
+
+    box-shadow:
+        0 5px 12px rgba(225, 29, 72, 0.12);
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.empty-favorites {
+
+    text-align: center;
+
+    padding: 55px 20px;
+}
+
+
+.empty-favorites-icon {
+
+    font-size: 44px;
+
+    color: #cbd5e1;
+
+    margin-bottom: 12px;
+}
+
+
+.empty-favorites h3 {
+
+    margin: 0 0 8px;
+
+    color: #172033;
+
+    font-size: 20px;
+}
+
+
+.empty-favorites p {
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   DARK THEME
+   ========================================================= */
+
+body.dark-theme .favorites-page,
+body[data-theme="dark"] .favorites-page {
+
+    background: #0f172a;
+}
+
+
+body.dark-theme .favorites-page .back-button,
+body[data-theme="dark"] .favorites-page .back-button {
+
+    color: #cbd5e1;
+}
+
+
+body.dark-theme .favorites-page .back-button:hover,
+body[data-theme="dark"] .favorites-page .back-button:hover {
+
+    color: #ffffff;
+}
+
+
+body.dark-theme .favorites-header h1,
+body[data-theme="dark"] .favorites-header h1 {
+
+    color: #f8fafc;
+}
+
+
+body.dark-theme .favorites-header p,
+body[data-theme="dark"] .favorites-header p {
+
+    color: #94a3b8;
+}
+
+
+body.dark-theme .favorites-header-icon,
+body[data-theme="dark"] .favorites-header-icon {
+
+    background: #182235;
+
+    border-color: #2b394d;
+
+    color: #fb7185;
+
+    box-shadow: none;
+}
+
+
+body.dark-theme .favorites-container,
+body[data-theme="dark"] .favorites-container {
+
+    background: #111827;
+
+    border-color: #263244;
+
+    box-shadow: none;
+}
+
+
+body.dark-theme .favorites-section-title h2,
+body[data-theme="dark"] .favorites-section-title h2 {
+
+    color: #f8fafc;
+}
+
+
+body.dark-theme .favorites-section-title p,
+body[data-theme="dark"] .favorites-section-title p {
+
+    color: #94a3b8;
+}
+
+
+body.dark-theme .favorite-card,
+body[data-theme="dark"] .favorite-card {
+
+    background: #182235;
+
+    border-color: #2b394d;
+}
+
+
+body.dark-theme .favorite-card:hover,
+body[data-theme="dark"] .favorite-card:hover {
+
+    border-color: #475569;
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+
+body.dark-theme .favorite-card h3,
+body[data-theme="dark"] .favorite-card h3 {
+
+    color: #f8fafc;
+}
+
+
+body.dark-theme .favorite-location-icon,
+body[data-theme="dark"] .favorite-location-icon {
+
+    background: #3a1f29;
+}
+
+
+body.dark-theme .favorite-remove,
+body[data-theme="dark"] .favorite-remove {
+
+    background: #321d25;
+
+    border-color: #7f3043;
+
+    color: #fb7185;
+}
+
+
+body.dark-theme .favorite-remove:hover,
+body[data-theme="dark"] .favorite-remove:hover {
+
+    background: #48202c;
+}
+
+
+body.dark-theme .empty-favorites h3,
+body[data-theme="dark"] .empty-favorites h3 {
+
+    color: #f8fafc;
+}
+
+
+body.dark-theme .empty-favorites p,
+body[data-theme="dark"] .empty-favorites p {
+
+    color: #94a3b8;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .favorites-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .favorites-page {
+
+        padding: 25px 14px 50px;
+    }
+
+
+    .favorites-container {
+
+        padding: 20px;
+
+        border-radius: 17px;
+    }
+
+
+/* =========================================================
+   FAVORITES PAGE HEADING
+   ========================================================= */
+
+.favorites-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+
+    margin-bottom: 34px;
+}
+
+
+/* Heart beside heading */
+
+.favorites-header-icon {
+    width: 62px;
+    height: 62px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 18px;
+
+    background: #fff1f4;
+
+    border: 1px solid #ffe0e7;
+
+    color: #e11d48;
+
+    font-size: 27px;
+
+    box-shadow:
+        0 6px 18px rgba(225, 29, 72, 0.08);
+}
+
+
+/* Main heading */
+
+.favorites-header h1 {
+    margin: 0;
+
+    color: #172033;
+
+    font-size: 34px;
+    font-weight: 750;
+
+    line-height: 1.15;
+
+    letter-spacing: -0.7px;
+}
+
+
+/* Subtitle */
+
+.favorites-header p {
+    margin: 7px 0 0;
+
+    color: #64748b;
+
+    font-size: 15px;
+
+    line-height: 1.5;
+}
+
+
+/* Dark mode */
+
+body.dark-theme .favorites-header-icon,
+body[data-theme="dark"] .favorites-header-icon {
+    background: #321d25;
+    border-color: #542431;
+    color: #fb7185;
+}
+
+body.dark-theme .favorites-header h1,
+body[data-theme="dark"] .favorites-header h1 {
+    color: #f8fafc;
+}
+
+body.dark-theme .favorites-header p,
+body[data-theme="dark"] .favorites-header p {
+    color: #94a3b8;
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+    .favorites-header {
+        gap: 13px;
+        margin-bottom: 28px;
+    }
+
+    .favorites-header-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 15px;
+        font-size: 23px;
+    }
+
+    .favorites-header h1 {
+        font-size: 27px;
+    }
+
+    .favorites-header p {
+        font-size: 13px;
+    }
+}
+
+
+    .favorites-header-icon {
+
+        width: 50px;
+
+        height: 50px;
+
+        border-radius: 14px;
+
+        font-size: 23px;
+    }
+
+
+    .favorites-header h1 {
+
+        font-size: 25px;
+    }
+
+
+    .favorites-header p {
+
+        font-size: 13px;
+    }
+
+
+    .favorites-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+}
+
+/* Photo-led favorites cards — consistent with Explore place cards */
+.favorites-grid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
+.favorite-card{display:flex;flex-direction:column;border-radius:18px;background:#fff;overflow:hidden;box-shadow:0 8px 24px rgba(25,45,80,.07)}
+.favorite-card-image{height:165px;position:relative;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e9effb,#dfe8f6);overflow:hidden}
+.favorite-card-image img{width:100%;height:100%;object-fit:cover;display:block}
+.favorite-image-fallback{position:absolute;font-size:30px;opacity:.65}
+.favorite-card-image img:not([src=""])~.favorite-image-fallback{display:none}
+.favorite-card-body{padding:16px;display:flex;flex:1;flex-direction:column;gap:12px}
+.favorite-card-copy h3{margin:5px 0 7px;font-size:17px;color:#172033}
+.favorite-card-copy p{margin:0;color:#64748b;font-size:13px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.favorite-kicker,.profile-place-label{font-size:10px;font-weight:700;letter-spacing:.09em;color:#647db1}
+.favorite-card-actions{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
+.favorite-card-actions a{display:inline-flex;padding:9px 13px;border-radius:9px;background:#edf3ff;color:#2857a4;text-decoration:none;font-size:13px;font-weight:700}
+@media(max-width:600px){.favorites-grid{grid-template-columns:1fr}.favorite-card-image{height:190px}}
+
+.favorite-shared-card .real-place-image{height:190px;overflow:hidden}
+.favorite-shared-card .real-place-image img{width:100%;height:100%;object-fit:cover}
+.favorite-shared-card .real-place-actions{display:flex;gap:9px}
+.favorite-shared-card .favorite-remove{border:1px solid #d9e3f2;border-radius:10px;padding:10px 15px;background:#fff;color:#b34b5b;font-weight:600;cursor:pointer}
+.favorite-shared-card .favorite-add{flex:1;border:0;border-radius:10px;padding:10px 15px;background:#2863e9;color:white;font-weight:600;cursor:pointer}
+.favorite-shared-card .place-details-button{width:100%;margin-top:10px}
+.favorite-image-fallback{display:none!important}
+
+/* Refined shared place-card layout for Favorites */
+.favorites-page{max-width:1180px;margin:0 auto;padding:38px 22px 64px}
+.favorites-wrapper{max-width:1120px;margin:0 auto}
+.favorites-page .back-button{display:inline-flex;margin:0 0 22px;color:#526782;text-decoration:none;font-weight:600}
+.favorites-page .favorites-header{margin-bottom:22px}
+.favorites-page .favorites-container{padding:26px;border-radius:22px}
+.favorites-page .favorites-section-title{margin-bottom:20px}
+.favorites-page .favorites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:22px;align-items:stretch}
+.favorites-page .favorite-shared-card{display:flex;flex-direction:column;min-width:0;border:1px solid #e2e8f0;border-radius:18px;background:#fff;overflow:hidden;box-shadow:0 8px 24px rgba(25,45,80,.07);transition:transform .18s ease,box-shadow .18s ease}
+.favorites-page .favorite-shared-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(25,45,80,.12)}
+.favorites-page .favorite-shared-card .real-place-image{height:185px;min-height:185px;background:linear-gradient(135deg,#eaf0fa,#dfe8f5);overflow:hidden}
+.favorites-page .favorite-shared-card .real-place-image img{width:100%;height:100%;object-fit:cover;display:block}
+.favorites-page .favorite-shared-card .no-place-image{height:100%;display:grid;place-items:center;color:#60799b;font-size:15px}
+.favorites-page .favorite-shared-card .real-place-content{display:flex;flex:1;flex-direction:column;gap:9px;padding:17px}
+.favorites-page .favorite-shared-card h3{margin:0;color:#183b65;font-size:18px;line-height:1.35}
+.favorites-page .favorite-shared-card p{margin:0;color:#61738b;font-size:13px;line-height:1.55}
+.favorites-page .favorite-shared-card .real-place-location{font-weight:650;color:#526a8b}
+.favorites-page .favorite-shared-card .real-place-timing{margin-top:2px}
+.favorites-page .favorite-shared-card .real-place-actions{display:flex;gap:9px;margin-top:auto;padding-top:8px}
+.favorites-page .favorite-shared-card .favorite-add,.favorites-page .favorite-shared-card .favorite-remove,.favorites-page .favorite-shared-card .place-details-button{min-height:42px;border-radius:10px;font:600 13px/1.2 inherit;cursor:pointer}
+.favorites-page .favorite-shared-card .favorite-add{flex:1;border:0;background:linear-gradient(110deg,#2563eb,#5b45e8);color:#fff;padding:10px 14px}
+.favorites-page .favorite-shared-card .favorite-remove{border:1px solid #f0cbd2;background:#fff;color:#b4233c;padding:10px 14px}
+.favorites-page .favorite-shared-card .place-details-button{width:100%;margin-top:2px;border:1px solid #d7e4f7;background:#f2f6ff;color:#2457a6;padding:10px}
+.favorites-page .favorite-shared-card button:hover{filter:brightness(.97)}
+@media(max-width:640px){.favorites-page{padding:25px 14px 45px}.favorites-page .favorites-container{padding:17px}.favorites-page .favorites-grid{grid-template-columns:1fr}.favorites-page .favorite-shared-card .real-place-image{height:200px}}

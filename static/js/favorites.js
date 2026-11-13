@@ -1,0 +1,57 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const grid=document.getElementById("favoritesGrid"), empty=document.getElementById("emptyFavorites");
+  if(!grid)return;
+  const read=k=>{try{const v=JSON.parse(localStorage.getItem(k)||"[]");return Array.isArray(v)?v:[]}catch{return[]}};
+  const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+  const nameOf=p=>typeof p==="string"?p:(p?.name||p?.title||"");
+  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const findCached=p=>{
+    for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k?.startsWith("aiTravelPlacesCache:"))continue;
+      try{const a=JSON.parse(localStorage.getItem(k)||"{}").places||[];const x=a.find(v=>nameOf(v).toLowerCase()===nameOf(p).toLowerCase());if(x)return x;}catch{}}
+    return {};
+  };
+  function render(){
+    const list=read("favoritePlaces");grid.innerHTML="";grid.style.display=list.length?"grid":"none";
+    if(empty)empty.style.display=list.length?"none":"block";
+    list.forEach((raw,index)=>{
+      const p=typeof raw==="string"?{name:raw}:raw, cached=findCached(p), item={...cached,...p};
+      const name=nameOf(item), image=item.image||"", description=item.description||item.category||"Explore this destination";
+      const shortDescription = description.length > 105 ? description.slice(0, 102).trimEnd() + "..." : description;
+      const card=document.createElement("article");card.className="real-place-card favorite-shared-card";
+      card.innerHTML=`<div class="real-place-image">${image?`<img src="${esc(image)}" alt="${esc(name)}" loading="lazy">`:`<div class="no-place-image">🏞️</div>`}</div>
+       <div class="real-place-content"><h3>${esc(name)}</h3><p class="real-place-location">${esc(item.destination||"Saved place")}</p>
+       <p>${esc(shortDescription)}</p>
+       <div class="real-place-actions"><button type="button" class="favorite-add">+ Add to Trip</button><button type="button" class="favorite-remove">Remove</button></div>
+       <button type="button" class="place-details-button favorite-details">See Details →</button></div>`;
+      card.querySelector("img")?.addEventListener("error",e=>{e.target.remove();});
+      card.querySelector(".favorite-remove").onclick=()=>{const a=read("favoritePlaces");a.splice(index,1);write("favoritePlaces",a);render();};
+      card.querySelector(".favorite-add").onclick=()=>{
+        const a=read("selectedTripPlaces");
+        const trip=(()=>{try{return JSON.parse(sessionStorage.getItem("tripRequirements")||"{}")}catch{return {}}})();
+        const destination=String(item.destination||trip.destination||"").trim();
+        const enriched={...item,destination};
+        if(!a.some(x=>nameOf(x).toLowerCase()===name.toLowerCase() &&
+          String(x.destination||"").toLowerCase()===destination.toLowerCase())) a.push(enriched);
+        write("selectedTripPlaces",a);
+        card.querySelector(".favorite-add").textContent="✓ Added to Trip";
+      };
+      card.querySelector(".favorite-details").onclick=()=>{
+        const modal=document.createElement("div");modal.className="place-details-modal";
+        modal.innerHTML=`<div class="place-details-panel" role="dialog" aria-modal="true"><button class="place-details-close" type="button">×</button>${image?`<img class="place-details-image" src="${esc(image)}" alt="${esc(name)}">`:""}<div class="place-details-content"><h2>${esc(name)}</h2><p>${esc(description)}</p><p>${esc(item.destination||"")}</p>${item.website?`<a href="${esc(item.website)}" target="_blank" rel="noopener">Official website</a>`:""} ${item.map_url?`<a href="${esc(item.map_url)}" target="_blank" rel="noopener">Open map</a>`:""}</div></div>`;
+        document.body.append(modal);modal.querySelector("button").onclick=()=>modal.remove();modal.onclick=e=>{if(e.target===modal)modal.remove();};
+      };
+      // Clicking the photo opens the same details popup.
+      const photo = card.querySelector(".real-place-image");
+      if (photo) {
+        photo.style.cursor = "pointer";
+        photo.title = "Click to see place details";
+        photo.addEventListener("click", () => {
+          card.querySelector(".favorite-details").click();
+        });
+      }
+
+      grid.append(card);
+    });
+  }
+  render();window.addEventListener("storage",e=>{if(e.key==="favoritePlaces")render();});
+});

@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}
+AI Travel Assistant
+{% endblock %}
+
+
+{% block content %}
+
+<style>
+.chat-page{height:calc(100vh - 150px);min-height:520px;max-height:900px;display:flex;flex-direction:column;overflow:hidden;padding:18px 16px 24px}
+.chat-page-top{flex:0 0 auto}.chat-container{width:min(920px,100%);height:100%;min-height:0;margin:0 auto;display:flex;flex-direction:column;overflow:hidden}
+.chat-page-header{flex:0 0 auto}.chat-messages{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scroll-behavior:smooth}
+.chat-input-container{flex:0 0 auto;position:relative;background:#fff}.chat-hint{flex:0 0 auto}
+.message{animation:none!important;transform:none!important}.message-bubble{max-width:min(760px,82%);overflow-wrap:anywhere}
+#chatInput{resize:none;max-height:120px;min-height:48px}
+#sendButton{flex:0 0 48px;transition:background .15s ease,opacity .15s ease}
+#sendButton:disabled{opacity:.55;cursor:wait}
+@media(max-width:650px){.chat-page{height:calc(100vh - 120px);padding:10px}.message-bubble{max-width:88%}}
+</style>
+<div class="chat-page">
+
+    <!-- BACK BUTTON -->
+
+    <div class="chat-page-top">
+
+        <buttonchatbot page
+            onclick="history.back()"
+            class="back-button">
+
+            ← Back
+
+        </button>
+
+    </div>
+
+
+    <!-- CHAT CONTAINER -->
+
+    <section class="chat-container">
+
+
+        <!-- HEADER -->
+
+        <div class="chat-page-header">
+
+            <div class="large-ai-avatar">
+                🤖
+            </div>
+
+            <div>
+
+                <h1>
+                    ✨ AI Travel Assistant
+                </h1>
+
+                <p>
+                    Let's plan your perfect journey together.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- MESSAGES -->
+
+        <div
+            id="chatMessages"
+            class="chat-messages">
+
+            <div class="message ai-message">
+
+                <div class="message-avatar">
+                    🤖
+                </div>
+
+                <div class="message-bubble">
+
+                   <h3>✨ Your travel command centre</h3>
+                    <p>Describe your trip naturally. I'll understand your needs, collect the essentials and build a workspace where you choose every part of your journey.</p>
+                    <p><strong>Try:</strong> “Plan a 4-day family trip from Chennai to Hyderabad with a ₹25,000 budget. We enjoy history and local food.”</p>
+
+<!-- <p>
+    Tell me whatever you know about your trip.
+    You don't need to provide everything.
+</p>
+
+<p>
+    📍 From: Optional<br>
+    🎯 Destination: Required<br>
+    📅 Number of days: Optional<br>
+    💰 Budget: Optional<br>
+    🚗 Transport: Optional<br>
+    👥 Travellers: Optional<br>
+    ❤️ Interests: Optional<br>
+    🍴 Food preference: Optional<br>
+    🏨 Hotel preference: Optional
+</p> -->
+
+<!-- <p>
+    You can also simply describe your trip naturally.
+    I'll handle the missing details. ✨
+</p> -->
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TYPING -->
+
+        <div
+            id="typingIndicator"
+            class="typing-indicator">
+
+            thinking...
+
+        </div>
+
+
+        <!-- INPUT -->
+
+        <div class="chat-input-container">
+
+            <textarea
+                id="chatInput"
+                placeholder="Tell me about your trip..."
+                rows="1"></textarea>
+
+
+            <button
+                id="sendButton"
+                class="send-button">
+
+                ➤
+
+            </button>
+
+        </div>
+
+
+        <p class="chat-hint">
+            Press Enter to send • Shift + Enter for a new line
+        </p>
+
+    </section>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script
+    src="{{ url_for('static', filename='js/chat.js') }}?v=30">
+</script>
+
+{% endblock %}

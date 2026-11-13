@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}My Travel Profile | AI Travel & Tourism{% endblock %}
+{% block extra_css %}
+<style>
+.profile-page{max-width:1100px;margin:42px auto;padding:0 20px 50px}
+.profile-hero,.profile-panel{background:#fff;border:1px solid #e7eaf0;border-radius:18px;padding:24px;margin-bottom:22px;box-shadow:0 8px 28px rgba(25,40,70,.06)}
+.profile-hero h1{margin:0 0 8px;color:#183b65}.profile-hero p{color:#65758b;margin:0}
+.profile-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-top:20px}
+.profile-stat{background:#f4f8ff;border-radius:14px;padding:16px}.profile-stat strong{display:block;font-size:25px;color:#1769aa}.profile-stat span{color:#607086;font-size:13px}
+.profile-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.profile-item{border:1px solid #e8edf4;border-radius:12px;padding:15px}.profile-item h3{margin:0 0 8px;color:#24496e}.profile-item p{margin:4px 0;color:#65758b;font-size:14px}
+.profile-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}.profile-actions a,.profile-actions button{border:0;border-radius:9px;padding:10px 15px;background:#1769aa;color:white;text-decoration:none;cursor:pointer}
+.profile-empty{color:#718096;padding:15px 0}
+.profile-hero{background:linear-gradient(125deg,#eef3ff,#fff 65%,#f5efff)}
+.profile-actions a,.profile-actions button{font-weight:600}
+.profile-item{transition:transform .18s,box-shadow .18s}.profile-item:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(30,60,100,.08)}
+
+.profile-page{max-width:1180px}
+.profile-hero{position:relative;overflow:hidden;border-radius:24px;padding:32px;background:linear-gradient(120deg,#eaf1ff 0%,#fff 55%,#f3edff 100%)}
+.profile-hero h1{font-size:30px;letter-spacing:-.6px}
+.profile-panel{border-radius:22px;padding:26px}
+.profile-list{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+.trip-saved-card,.profile-place-card{padding:0;overflow:hidden;border-radius:17px;background:#fff;box-shadow:0 7px 22px rgba(25,45,80,.06)}
+.profile-trip-cover{height:145px;position:relative;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#dce9ff,#e9e2ff);overflow:hidden}
+.profile-trip-cover img,.profile-place-image img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.profile-trip-cover span{font-size:36px;z-index:1;filter:drop-shadow(0 2px 5px #fff)}
+.profile-trip-cover b{position:absolute;left:14px;bottom:12px;z-index:2;padding:7px 11px;border-radius:9px;background:rgba(255,255,255,.92);color:#1c365c;font-size:15px}
+.profile-trip-info{padding:15px}.profile-trip-info p{margin:4px 0;color:#52647e}.profile-trip-info small{color:#8290a4}
+.profile-place-image{height:155px;position:relative;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e7efff,#e6e9f7);overflow:hidden}
+.profile-place-image span{font-size:34px;z-index:1}
+.profile-place-copy{padding:15px}.profile-place-copy h3{margin:5px 0;color:#23496f}.profile-place-copy p{color:#65758b}
+.profile-place-copy button{border:1px solid #e2e8f0;background:#fff;color:#52647e;border-radius:8px;padding:8px 11px;cursor:pointer}
+.profile-actions button,.profile-actions a{border-radius:10px;padding:10px 15px}
+
+.stat-link{width:100%;border:0;text-align:left;cursor:pointer;color:inherit}.stat-link:hover{outline:2px solid #c9d8ff;transform:translateY(-2px)}.profile-panel{scroll-margin-top:95px}
+</style>
+{% endblock %}
+{% block content %}
+<section class="profile-page">
+  <header class="profile-hero">
+    <h1>👤 My Travel Profile</h1>
+    <p>Your saved trips and selected places on this device.</p>
+    <div class="profile-stats">
+      <button class="profile-stat stat-link" type="button" data-target="profileTripsPanel"><strong id="profileTripCount">0</strong><span>Saved trips · View</span></button>
+      <button class="profile-stat stat-link" type="button" data-target="profileFavoritesPanel"><strong id="profileFavoriteCount">0</strong><span>Favorite places · View</span></button>
+      <button class="profile-stat stat-link" type="button" data-target="profileSelectedPanel"><strong id="profileSelectedCount">0</strong><span>Places added · View</span></button>
+    </div>
+    <div class="profile-actions">
+      <a href="/chat">＋ New trip</a><a href="/favorites">♡ Favorites</a><button type="button" id="profilePlanTrip">🧭 Plan my selected places</button>
+      <button type="button" id="clearTripHistory">Clear trip history</button>
+    </div>
+  </header>
+  <section class="profile-panel" id="profileTripsPanel">
+    <h2>🧳 Past trip plans</h2>
+    <div id="profileTripList" class="profile-list"><p class="profile-empty">Loading your trips...</p></div>
+  </section>
+  <section class="profile-panel" id="profileFavoritesPanel">
+    <h2>♥ Favorite places</h2>
+    <div id="profileFavoriteList" class="profile-list"></div>
+  </section>
+  <section class="profile-panel" id="profileSelectedPanel">
+    <h2>📍 Places added to trips</h2>
+    <div id="profileSelectedList" class="profile-list"><p class="profile-empty">No places added yet.</p></div>
+  </section>
+
+</section>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/profile.js') }}?v=30" defer></script>
+{% endblock %}

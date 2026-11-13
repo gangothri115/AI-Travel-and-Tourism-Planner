@@ -1,0 +1,14 @@
+venv/
+.env
+__pycache__/
+*.pyc
+.env
+venv/
+__pycache__/
+*.pyc
+instance/
+
+# Secret environment files
+.env
+.env.*
+!.env.example

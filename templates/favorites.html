@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}
+Favorites | AI Travel & Tourism
+{% endblock %}
+
+
+{% block extra_css %}
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/favorites.css') }}?v=6"
+>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="favorites-page">
+
+    <div class="favorites-wrapper">
+
+
+        <!-- Back Button -->
+        <a href="/" class="back-button">
+            ← Back
+        </a>
+
+
+        <!-- =================================================
+             PAGE HEADING
+             ================================================= -->
+
+        <header class="favorites-header">
+
+            <!-- Heading Icon -->
+            <div class="favorites-header-icon">
+                ♥
+            </div>
+
+
+            <!-- Heading Text -->
+            <div class="favorites-heading-content">
+            <h1 class="gradient-heading">
+                My Favorites
+            </h1>
+
+                <p>
+                    Places you've saved for your future trips.
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             SAVED PLACES
+             ================================================= -->
+
+        <section class="favorites-container">
+
+
+            <!-- Section Heading -->
+
+            <div class="favorites-section-title">
+
+                <span class="section-heart">
+                    ♥
+                </span>
+
+                <div>
+
+                            <h2 class="gradient-section-heading">
+                Saved Travel Destinations
+            </h2>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 FAVORITES GRID
+
+                 JavaScript will insert the saved places here.
+                 ================================================= -->
+
+            <div
+                id="favoritesGrid"
+                class="favorites-grid"
+            >
+            </div>
+
+
+            <!-- =================================================
+                 EMPTY FAVORITES
+                 ================================================= -->
+
+            <div
+                id="emptyFavorites"
+                class="empty-favorites"
+                style="display: none;"
+            >
+
+                <div class="empty-favorites-icon">
+                    ♡
+                </div>
+
+                <h3>
+                    No favorites yet
+                </h3>
+
+                <p>
+                    Save places from your travel plans
+                    to see them here.
+                </p>
+
+            </div>
+
+
+        </section>
+
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script
+    src="{{ url_for('static', filename='js/favorites.js') }}?v=30"
+    defer
+></script>
+
+{% endblock %}

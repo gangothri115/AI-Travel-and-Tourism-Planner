@@ -1,0 +1,96 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const read = key => { try { const v=JSON.parse(localStorage.getItem(key)||"[]"); return Array.isArray(v)?v:[]; } catch { return []; } };
+  const byId=id=>document.getElementById(id);
+  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const trips=read("travelTripHistory"), favorites=read("favoritePlaces"), selected=read("selectedTripPlaces");
+  [["profileTripCount",trips.length],["profileFavoriteCount",favorites.length],["profileSelectedCount",selected.length]].forEach(([id,n])=>{if(byId(id))byId(id).textContent=n;});
+  const findImage=place=>{
+    if(place?.image)return place.image;
+    for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k?.startsWith("aiTravelPlacesCache:"))continue;try{const data=JSON.parse(localStorage.getItem(k)||"{}");const found=(data.places||[]).find(x=>(x.name||"").toLowerCase()===(place?.name||"").toLowerCase());if(found?.image)return found.image;}catch{}}
+    return "";
+  };
+  const tripList=byId("profileTripList");
+  if(tripList){
+    tripList.innerHTML="";
+    if(!trips.length)tripList.innerHTML='<p class="profile-empty">No saved trips yet. Start planning your first journey.</p>';
+    trips.slice().reverse().forEach((trip,idx)=>{
+      const card=document.createElement("article");card.className="profile-item trip-saved-card";
+      const places=trip.places||trip.selected_places||[];
+      const cover=findImage(places[0]||{});
+      card.innerHTML=`<div class="profile-trip-cover">${cover?`<img src="${esc(cover)}" alt="" loading="lazy" onerror="this.remove()">`:""}<b>${esc(trip.trip_name||trip.destination||"Saved trip")}</b></div><div class="profile-trip-info"><p>${esc(trip.from_location||"Starting point not set")} → ${esc(trip.destination||"Destination not set")}</p><p>${esc(trip.days||"Flexible")} days · ${places.length} selected places</p><small>${trip.saved_at?new Date(trip.saved_at).toLocaleDateString():"Saved journey"}</small><div class="profile-actions"><button class="open-trip">Open trip</button><button class="plan-trip">Plan trip</button></div></div>`;
+      const restore=()=>{sessionStorage.setItem("tripRequirements",JSON.stringify(trip.requirements||trip));localStorage.setItem("selectedTripPlaces",JSON.stringify(places));sessionStorage.removeItem("tripHistorySavedForCurrentPlan");};
+      card.querySelector(".open-trip").addEventListener("click",()=>{restore();location.href="/planning";});
+      card.querySelector(".plan-trip").addEventListener("click",()=>{restore();sessionStorage.setItem("profileAutoPlan","1");location.href="/planning#generateItinerary";});
+      tripList.append(card);
+    });
+  }
+  const selectedList=byId("profileSelectedList");
+  if(selectedList){
+    selectedList.innerHTML="";
+    if(!selected.length) selectedList.innerHTML='<p class="profile-empty">No places added yet.</p>';
+    const groups=new Map();
+    selected.forEach(place=>{
+      const destination=String(place.destination||"Current trip").trim()||"Current trip";
+      if(!groups.has(destination)) groups.set(destination,[]);
+      groups.get(destination).push(place);
+    });
+    groups.forEach((places,destination)=>{
+      const group=document.createElement("section");
+      group.className="profile-destination-group";
+      group.innerHTML=`<header class="profile-destination-heading"><div><span>TRIP DESTINATION</span><h3>${esc(destination)}</h3></div><strong>${places.length} ${places.length===1?"place":"places"}</strong></header><div class="profile-list profile-destination-places"></div>`;
+      const grid=group.querySelector(".profile-destination-places");
+      places.forEach(place=>{
+        const card=document.createElement("article");card.className="profile-item profile-place-card";
+        const image=findImage(place);
+        card.innerHTML=`<div class="profile-place-image">${image?`<img src="${esc(image)}" alt="${esc(place.name||"Place")}" loading="lazy" onerror="this.remove()">`:""}</div><div class="profile-place-copy"><h3>${esc(place.name||"Saved place")}</h3><p>${esc(place.category||"Attraction")}</p><div class="profile-place-actions"><button type="button" class="open-place-trip">Open trip</button><button type="button" class="remove-place">Remove</button></div></div>`;
+        card.querySelector(".open-place-trip").addEventListener("click",()=>{
+          const current=(()=>{try{return JSON.parse(sessionStorage.getItem("tripRequirements")||"{}")}catch{return {}}})();
+          sessionStorage.setItem("tripRequirements",JSON.stringify({...current,destination,places}));
+          location.href="/planning";
+        });
+        card.querySelector(".remove-place").addEventListener("click",()=>{
+          const all=read("selectedTripPlaces");
+          const index=all.findIndex(x=>String(x.id||"")===String(place.id||"") &&
+            String(x.name||"").toLowerCase()===String(place.name||"").toLowerCase() &&
+            String(x.destination||"").toLowerCase()===destination.toLowerCase());
+          if(index>=0) all.splice(index,1);
+          localStorage.setItem("selectedTripPlaces",JSON.stringify(all));
+          location.reload();
+        });
+        grid.append(card);
+      });
+      selectedList.append(group);
+    });
+  }
+
+  document.querySelectorAll(".stat-link[data-target]").forEach(button=>{
+    button.addEventListener("click",()=>{
+      const panel=document.getElementById(button.dataset.target);
+      if(panel){panel.scrollIntoView({behavior:"smooth",block:"start"});panel.classList.add("profile-panel-highlight");setTimeout(()=>panel.classList.remove("profile-panel-highlight"),1200);}
+    });
+  });
+  const favList=byId("profileFavoriteList");
+  if(favList){
+    favList.innerHTML="";
+    if(!favorites.length)favList.innerHTML='<p class="profile-empty">No favorite places saved yet.</p>';
+    favorites.forEach(place=>{
+      const name=typeof place==="string"?place:(place.name||place.title||"Saved place");
+      const card=document.createElement("article");card.className="profile-item profile-place-card";
+      const image=findImage(typeof place==="object"?place:{name});
+      card.innerHTML=`<div class="profile-place-image">${image?`<img src="${esc(image)}" alt="${esc(name)}" loading="lazy" onerror="this.remove()">`:""}</div><div class="profile-place-copy"><span class="profile-place-label">YOUR FAVORITE</span><h3>${esc(name)}</h3><a href="/favorites">Open favorites</a></div>`;
+      favList.append(card);
+    });
+  }
+
+  const plan=byId("profilePlanTrip");
+  if(plan)plan.addEventListener("click",()=>{
+    if(!selected.length){alert("Add places to a trip first.");return;}
+    const trip={...(JSON.parse(sessionStorage.getItem("tripRequirements")||"{}")),places:selected};
+    sessionStorage.setItem("tripRequirements",JSON.stringify(trip));
+    sessionStorage.removeItem("tripHistorySavedForCurrentPlan");
+    sessionStorage.setItem("profileAutoPlan","1");
+    location.href="/planning#generateItinerary";
+  });
+  const clear=byId("clearTripHistory");
+  if(clear)clear.addEventListener("click",()=>{if(confirm("Clear saved trip history from this browser?")){localStorage.removeItem("travelTripHistory");location.reload();}});
+});

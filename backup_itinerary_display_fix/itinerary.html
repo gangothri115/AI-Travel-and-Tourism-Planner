@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Your Smart Travel Blueprint | AI Travel{% endblock %}
+{% block extra_css %}
+<style>
+.itinerary-page{max-width:1220px;margin:34px auto 70px;padding:0 22px;color:#183451}
+.trip-hero{position:relative;overflow:hidden;border-radius:28px;padding:34px;background:linear-gradient(120deg,#123e68,#246ca0 58%,#7ba9c9);color:white;box-shadow:0 18px 45px #173d6326}
+.trip-hero:after{content:"✦";position:absolute;right:5%;top:-65px;font-size:240px;color:#ffffff12}
+.hero-kicker{font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:.8;font-weight:700}
+.trip-hero h1{font-size:clamp(28px,4vw,42px);margin:10px 0}.trip-hero p{max-width:700px;line-height:1.6;opacity:.9}
+.itinerary-meta{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}.itinerary-chip{padding:8px 13px;border-radius:30px;background:#ffffff20;border:1px solid #ffffff35;font-size:13px}
+.itinerary-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:20px 0;flex-wrap:wrap}.itinerary-actions{display:flex;gap:10px;flex-wrap:wrap}
+.itinerary-actions button,.itinerary-actions a{border:0;border-radius:11px;padding:11px 16px;background:#1769a6;color:#fff;text-decoration:none;font-weight:650;cursor:pointer}.itinerary-actions .secondary{background:#eaf2fa;color:#245477}
+.trip-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0}.trip-stat,.day-card,.recommendation-panel{background:#fff;border:1px solid #e2eaf2;border-radius:20px;box-shadow:0 8px 26px #1834510b}.trip-stat{padding:18px}.trip-stat strong{display:block;font-size:25px;color:#1769a6}.trip-stat span{font-size:13px;color:#718398}
+.section-heading{display:flex;align-items:end;justify-content:space-between;margin:30px 2px 14px;gap:12px}.section-heading h2{margin:0;color:#183d60;font-size:24px}.section-heading p{margin:5px 0 0;color:#718398;font-size:13px}
+.day-card{padding:22px;margin-bottom:18px}.day-top{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #edf1f5;padding-bottom:14px;margin-bottom:16px}.day-top h3{margin:0;font-size:20px;color:#174a76}.day-top span{font-size:12px;color:#67829a;background:#eef5fb;padding:7px 11px;border-radius:20px}
+.day-layout{display:grid;grid-template-columns:1fr 270px;gap:20px}.place-timeline{display:grid;gap:12px}.timeline-place{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start}.timeline-marker{width:38px;height:38px;border-radius:13px;background:#eaf3fb;display:grid;place-items:center;font-size:18px}.timeline-content{padding:2px 0 12px;border-bottom:1px dashed #e4ebf2}.timeline-content strong{display:block;color:#254e70}.timeline-content small{display:block;color:#7b8da0;margin-top:4px;line-height:1.5}.place-link{display:inline-block;margin-top:6px;font-size:12px;color:#1670ad;text-decoration:none}
+.day-side{background:#f5f9fc;border-radius:16px;padding:15px}.day-side h4{margin:0 0 10px;color:#315c7e}.day-side p{font-size:13px;color:#687e91;line-height:1.55;margin:7px 0}.day-side a{font-size:12px;color:#1769a6}
+.recommendation-panel{padding:22px;margin:18px 0}.recommendation-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.recommendation-card{border:1px solid #e6edf4;border-radius:15px;padding:15px;background:#fbfdff}.recommendation-card h4{margin:0 0 7px;color:#204d70}.recommendation-card p{font-size:13px;color:#718398;margin:5px 0;line-height:1.5}.recommendation-card a{display:inline-block;margin-top:8px;color:#1769a6;font-size:13px;font-weight:650;text-decoration:none}
+.empty-state,.loading-state{padding:25px;border-radius:16px;background:#f5f9fc;color:#718398;text-align:center}
+.disclaimer{font-size:12px;color:#8191a0;line-height:1.6;margin:16px 2px}
+@media(max-width:760px){.day-layout{grid-template-columns:1fr}.trip-stats{grid-template-columns:1fr}.trip-hero{padding:25px}.itinerary-page{padding:0 14px}.day-card{padding:16px}}
+@media print{nav,.itinerary-toolbar,.itinerary-actions{display:none!important}.itinerary-page{margin:0;max-width:none}.trip-hero{background:#eaf2fa!important;color:#183451!important;box-shadow:none}.trip-hero *{color:#183451!important}.day-card,.recommendation-panel{break-inside:avoid;box-shadow:none}}
+</style>
+{% endblock %}
+{% block content %}
+<main class="itinerary-page">
+ <section class="trip-hero">
+  <div class="hero-kicker">AI TRAVEL STUDIO · YOUR PERSONAL TRIP BLUEPRINT</div>
+  <h1 id="tripTitle">Your journey, thoughtfully planned.</h1>
+  <p id="tripIntro">A day-by-day travel flow built around your selected places, with nearby stays and food options to help you plan each stop.</p>
+  <div class="itinerary-meta" id="itineraryMeta"></div>
+ </section>
+ <div class="itinerary-toolbar">
+  <div><strong>YOUR TRAVEL OVERVIEW</strong><div style="font-size:13px;color:#7a8da0;margin-top:4px">A practical plan you can review and take with you.</div></div>
+  <div class="itinerary-actions"><button type="button" onclick="window.print()">↓ Download / Save PDF</button><a class="secondary" href="/planning">← Edit my trip</a></div>
+ </div>
+ <section class="trip-stats" id="tripStats"></section>
+ <div class="section-heading"><div><h2>🧭 Your day-by-day journey</h2><p>Every place you selected is included in the schedule below.</p></div></div>
+ <div id="itineraryDays" class="loading-state">Preparing your travel blueprint…</div>
+ <section class="recommendation-panel">
+  <div class="section-heading" style="margin-top:0"><div><h2>🏨 Places to stay nearby</h2><p>Nearby hotel and guest-house listings around your destination.</p></div></div>
+  <div id="hotelResults" class="loading-state">Finding nearby stays…</div>
+ </section>
+ <section class="recommendation-panel">
+  <div class="section-heading" style="margin-top:0"><div><h2>🍽️ Food stops around your trip</h2><p>Restaurants and cafés listed near your destination.</p></div></div>
+  <div id="restaurantResults" class="loading-state">Finding nearby restaurants…</div>
+ </section>
+ <p class="disclaimer">Place and nearby business listings depend on available OpenStreetMap data. Distance is approximate straight-line distance from the destination centre, not driving distance. Ratings, prices and booking availability are not assumed; confirm details with the provider before visiting.</p>
+</main>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/itinerary.js') }}?v=4" defer></script>
+{% endblock %}

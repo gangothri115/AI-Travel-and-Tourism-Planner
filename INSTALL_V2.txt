@@ -1,0 +1,27 @@
+AI TRAVEL TOURISM — ITINERARY POLISH V2
+======================================
+Fixes:
+- Removes the "Attraction"/category label below every itinerary stop.
+- Filters Mumbai/Bombay city-name records so the city itself is not shown as a sightseeing stop.
+- If live OpenStreetMap results are empty for Mumbai/Bombay, displays four named hotel suggestions and four named restaurant suggestions with individual Google Maps location links.
+- For other destinations, preserves the live map listings and honest no-results fallback.
+- Does not change app.py, databases, profile, favorites, or the places API.
+
+Install:
+1. Stop Flask with Ctrl+C.
+2. From the existing project folder:
+   cd ~/Desktop/AI_Travel_Tourism
+   mkdir -p backup_itinerary_v2
+   cp templates/itinerary.html backup_itinerary_v2/
+   cp static/js/itinerary.js backup_itinerary_v2/
+3. Extract this ZIP into the EXISTING project folder:
+   unzip -o ~/Downloads/AI_Travel_Tourism_ITINERARY_DISPLAY_FIX_V2.zip -d .
+4. Restart:
+   source venv/bin/activate
+   python app.py
+5. Refresh /itinerary with Ctrl+Shift+R.
+
+Note: Mumbai fallback suggestions are curated names, not live availability or price quotes. Map links open current location/search details. Other cities still rely on live provider data.
+Rollback:
+   cp backup_itinerary_v2/itinerary.html templates/itinerary.html
+   cp backup_itinerary_v2/itinerary.js static/js/itinerary.js

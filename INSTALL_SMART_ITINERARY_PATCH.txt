@@ -1,0 +1,57 @@
+AI TRAVEL TOURISM — SMART ITINERARY + NEARBY STAYS/FOOD PATCH
+=============================================================
+
+Files included:
+- app.py                         Adds GET /api/nearby (OSM hotels + restaurants)
+- templates/itinerary.html       Replaces basic itinerary with a designed trip blueprint
+- static/js/itinerary.js         Includes every selected place and renders nearby listings
+
+INSTALL ON UBUNTU (from your existing project folder)
+------------------------------------------------------
+1. Stop Flask with Ctrl+C.
+
+2. Open terminal and run (adjust the ZIP path if you saved it elsewhere):
+
+   cd ~/Desktop/AI_Travel_Tourism
+   mkdir -p backup_before_smart_itinerary
+   cp app.py backup_before_smart_itinerary/app.py
+   cp templates/itinerary.html backup_before_smart_itinerary/itinerary.html
+   cp static/js/itinerary.js backup_before_smart_itinerary/itinerary.js
+
+3. Extract the patch over the existing project (keeps all other files):
+
+   unzip -o ~/Downloads/AI_Travel_Tourism_SMART_ITINERARY_PATCH.zip -d .
+
+   If the ZIP is on your Desktop instead, use:
+   unzip -o ~/Desktop/AI_Travel_Tourism_SMART_ITINERARY_PATCH.zip -d .
+
+4. Start the project:
+
+   source venv/bin/activate
+   python app.py
+
+5. Open the itinerary and force-refresh Chrome with Ctrl+Shift+R.
+
+FEATURES / DATA NOTES
+---------------------
+- Every item in localStorage key "selectedTripPlaces" that is captured into
+  generatedTravelItinerary.selected_places is shown in the itinerary.
+- Places with coordinates are ordered by a nearest-next-stop heuristic.
+- Hotels and restaurants are queried from OpenStreetMap Overpass around the
+  destination centre. Listings include names, category, approximate straight-
+  line distance, and map links where data is available.
+- This does NOT claim live room availability, ratings, prices, or reservations.
+  Confirm these with the business before travel.
+- Public Overpass servers can be unavailable or rate-limited. In that case the
+  page provides Google Maps search links as a fallback.
+- The route page and existing planning.js logic are not replaced.
+
+ROLLBACK
+--------
+Stop Flask and restore the three backups:
+
+   cp backup_before_smart_itinerary/app.py app.py
+   cp backup_before_smart_itinerary/itinerary.html templates/itinerary.html
+   cp backup_before_smart_itinerary/itinerary.js static/js/itinerary.js
+
+Then restart with `python app.py`.

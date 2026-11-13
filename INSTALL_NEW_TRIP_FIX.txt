@@ -1,0 +1,22 @@
+PROFILE NEW TRIP BUTTON FIX
+
+This patch contains only:
+- templates/profile.html
+- static/js/profile.js
+
+Install:
+1. Stop Flask with Ctrl+C.
+2. Extract this ZIP directly into ~/Desktop/AI_Travel_Tourism.
+3. Choose Replace for the two files.
+4. Restart:
+   cd ~/Desktop/AI_Travel_Tourism
+   source venv/bin/activate
+   python app.py
+5. Open /profile and press Ctrl+Shift+R.
+
+Changes:
+- Removes "Plan my selected places" from the profile header.
+- Changes "New trip" to a button that clears only the current chatbot session
+  (travelConversation, tripRequirements, initialTravelMessage and temporary planning flags)
+  and opens /chat as a fresh conversation.
+- Does NOT delete saved destination groups or selected trip places.

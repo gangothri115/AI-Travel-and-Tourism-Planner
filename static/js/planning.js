@@ -1,0 +1,624 @@
+/* =====================================================
+   AI TRAVEL PLANNER
+   Real Places, Favorites, Add to Trip, Details
+===================================================== */
+
+document.addEventListener("DOMContentLoaded", function () {
+    const savedTrip = sessionStorage.getItem("tripRequirements");
+    let trip = {};
+
+    try {
+        trip = savedTrip ? JSON.parse(savedTrip) : {};
+    } catch (error) {
+        console.error("Could not read trip requirements:", error);
+    }
+
+    // Keep a local trip history for the Profile page (this browser only).
+    if (trip && trip.destination && !sessionStorage.getItem("tripHistorySavedForCurrentPlan")) {
+        try {
+            const history = JSON.parse(localStorage.getItem("travelTripHistory") || "[]");
+            history.push({ ...trip, saved_at: new Date().toISOString() });
+            localStorage.setItem("travelTripHistory", JSON.stringify(history.slice(-50)));
+            sessionStorage.setItem("tripHistorySavedForCurrentPlan", "1");
+        } catch (error) {
+            console.warn("Could not save trip history:", error);
+        }
+    }
+
+    const $ = (id) => document.getElementById(id);
+
+    function getValue(value, fallback = "Not specified") {
+        return value === null || value === undefined || value === ""
+            ? fallback
+            : value;
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+        })[character]);
+    }
+
+    /* ---------------- TRIP SUMMARY ---------------- */
+
+    if ($("fromLocation")) {
+        $("fromLocation").textContent =
+            getValue(trip.from_location);
+    }
+
+    if ($("destination")) {
+        $("destination").textContent =
+            getValue(trip.destination);
+    }
+
+    if ($("tripDays")) {
+        $("tripDays").textContent =
+            trip.days ? `${trip.days} days` : "AI estimated";
+    }
+
+    if ($("transport")) {
+        $("transport").textContent =
+            getValue(trip.transport, "AI suggested");
+    }
+
+    if ($("budget")) {
+        $("budget").textContent =
+            trip.budget !== null &&
+            trip.budget !== undefined &&
+            trip.budget !== ""
+                ? `₹${trip.budget}`
+                : "Flexible";
+    }
+
+    if ($("travellers")) {
+        $("travellers").textContent =
+            getValue(trip.travellers);
+    }
+
+
+    /* ---------------- EDITABLE TRIP SUMMARY ---------------- */
+
+    const summaryFields = {
+        from_location: {
+            label: "Starting location",
+            element: "fromLocation",
+            type: "text"
+        },
+        destination: {
+            label: "Destination",
+            element: "destination",
+            type: "text"
+        },
+        days: {
+            label: "Number of days",
+            element: "tripDays",
+            type: "number"
+        },
+        transport: {
+            label: "Transport",
+            element: "transport",
+            type: "text"
+        },
+        budget: {
+            label: "Budget in rupees",
+            element: "budget",
+            type: "number"
+        },
+        travellers: {
+            label: "Number of travellers",
+            element: "travellers",
+            type: "number"
+        }
+    };
+
+    document.querySelectorAll(".summary-item.editable[data-field]")
+        .forEach((item) => {
+            const field = item.dataset.field;
+            const config = summaryFields[field];
+
+            if (!config) return;
+
+            item.style.cursor = "pointer";
+            item.title = "Click to edit " + config.label;
+
+            item.addEventListener("click", function () {
+                const currentValue = trip[field] ?? "";
+                const enteredValue = window.prompt(
+                    "Enter " + config.label + ":",
+                    String(currentValue)
+                );
+
+                if (enteredValue === null) return;
+
+                const value = enteredValue.trim();
+
+                if (!value) {
+                    item.title = "Please enter a valid value";
+                    return;
+                }
+
+                if (config.type === "number") {
+                    const number = Number(value);
+
+                    if (!Number.isFinite(number) || number < 0 ||
+                        ((field === "days" || field === "travellers") &&
+                         (!Number.isInteger(number) || number < 1))) {
+                        item.title = "Please enter a valid positive number";
+                        return;
+                    }
+
+                    trip[field] = number;
+                } else {
+                    trip[field] = value;
+                }
+
+                sessionStorage.setItem(
+                    "tripRequirements",
+                    JSON.stringify(trip)
+                );
+
+                const display = $(config.element);
+
+                if (display) {
+                    if (field === "days") {
+                        display.textContent = trip.days + " days";
+                    } else if (field === "budget") {
+                        display.textContent = "₹" + trip.budget;
+                    } else {
+                        display.textContent = trip[field];
+                    }
+                }
+
+                // Refresh destination-dependent data immediately after an edit.
+                // Places module listens for this event and reloads the new destination.
+                if (field === "destination") {
+                    window.dispatchEvent(new CustomEvent("travel:destination-changed", {
+                        detail: { destination: value }
+                    }));
+                    if (typeof loadWeather === "function") loadWeather();
+                }
+                if (field === "destination" || field === "from_location") {
+                    if (typeof loadRoutes === "function") loadRoutes();
+                }
+            });
+        });
+
+    /* ---------------- TAB SWITCHING ---------------- */
+
+    const tabs = document.querySelectorAll(".planning-tab");
+    const sections = document.querySelectorAll(".tab-section");
+
+    tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+            tabs.forEach((item) => item.classList.remove("active"));
+            sections.forEach((section) =>
+                section.classList.remove("active")
+            );
+
+            tab.classList.add("active");
+
+            const section = $(`${tab.dataset.tab}-section`);
+            if (section) section.classList.add("active");
+        });
+    });
+
+    /* ---------------- PLACE STORAGE ---------------- */
+
+    function readStorage(key) {
+        try {
+            const value = JSON.parse(localStorage.getItem(key) || "[]");
+            return Array.isArray(value) ? value : [];
+        } catch {
+            return [];
+        }
+    }
+
+    function isSaved(key, place) {
+        const entries = readStorage(key);
+        return entries.some((entry) =>
+            String(typeof entry === "string" ? entry : entry.id) ===
+                String(place.id) ||
+            String(typeof entry === "string" ? entry : entry.name) ===
+                String(place.name)
+        );
+    }
+
+    function savePlace(key, place) {
+        const entries = readStorage(key);
+        const exists = entries.some((entry) =>
+            String(typeof entry === "string" ? entry : entry.id) ===
+                String(place.id) ||
+            String(typeof entry === "string" ? entry : entry.name) ===
+                String(place.name)
+        );
+
+        if (exists) {
+            const updated = entries.filter((entry) =>
+                String(typeof entry === "string" ? entry : entry.id) !==
+                    String(place.id) &&
+                String(typeof entry === "string" ? entry : entry.name) !==
+                    String(place.name)
+            );
+            localStorage.setItem(key, JSON.stringify(updated));
+            return false;
+        }
+
+        entries.push({
+            id: place.id,
+            name: place.name,
+            image: place.image || "",
+            map_url: place.map_url || "",
+            description: place.description || ""
+        });
+
+        localStorage.setItem(key, JSON.stringify(entries));
+        return true;
+    }
+
+    /* ---------------- PLACE DETAILS MODAL ---------------- */
+
+    function createDetailsModal() {
+        if ($("placeDetailsModal")) return;
+
+        const modal = document.createElement("div");
+        modal.id = "placeDetailsModal";
+        modal.className = "place-details-modal";
+        modal.setAttribute("aria-hidden", "true");
+
+        modal.innerHTML = `
+            <div class="place-details-dialog"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="placeDetailsTitle">
+
+                <button class="place-details-close"
+                        type="button"
+                        aria-label="Close details">×</button>
+
+                <div id="placeDetailsContent">
+                    <p>Loading place details...</p>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        modal.addEventListener("click", (event) => {
+            if (
+                event.target === modal ||
+                event.target.closest(".place-details-close")
+            ) {
+                modal.classList.remove("open");
+                modal.setAttribute("aria-hidden", "true");
+            }
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                modal.classList.remove("open");
+                modal.setAttribute("aria-hidden", "true");
+            }
+        });
+    }
+
+    async function openPlaceDetails(place) {
+        createDetailsModal();
+
+        const modal = $("placeDetailsModal");
+        const content = $("placeDetailsContent");
+
+        modal.classList.add("open");
+        modal.setAttribute("aria-hidden", "false");
+        content.innerHTML = "<p>Loading place details...</p>";
+
+        let details = place;
+
+        try {
+            const response = await fetch(
+                `/api/places/detail?id=${encodeURIComponent(place.id)}`
+            );
+
+            const result = await response.json();
+
+            if (response.ok && result.success && result.place) {
+                details = { ...place, ...result.place };
+            }
+        } catch (error) {
+            console.error("Place detail request failed:", error);
+        }
+
+        const image = details.image
+            ? `<img class="place-details-image"
+                    src="${escapeHTML(details.image)}"
+                    alt="${escapeHTML(details.name)}"
+                    onerror="this.style.display='none'">`
+            : "";
+
+        const mapLink = details.map_url
+            ? `<a href="${escapeHTML(details.map_url)}"
+                  target="_blank"
+                  rel="noopener noreferrer">📍 Open map</a>`
+            : "";
+
+        const websiteLink = details.website
+            ? `<a href="${escapeHTML(details.website)}"
+                  target="_blank"
+                  rel="noopener noreferrer">🌐 Official website</a>`
+            : "";
+
+        const wikipediaLink = details.wikipedia_url
+            ? `<a href="${escapeHTML(details.wikipedia_url)}"
+                  target="_blank"
+                  rel="noopener noreferrer">📚 Read more</a>`
+            : "";
+
+        content.innerHTML = `
+            ${image}
+
+            <div class="place-details-body">
+                <p class="place-details-category">
+                    ${escapeHTML(details.category || "Travel destination")}
+                </p>
+
+                <h2 id="placeDetailsTitle">
+                    ${escapeHTML(details.name)}
+                </h2>
+
+                <p>${escapeHTML(
+                    details.description || "No description is available yet."
+                )}</p>
+
+                <div class="place-details-facts">
+                    <p>
+                        <strong>🕒 Opening hours</strong><br>
+                        ${escapeHTML(
+                            details.opening_hours || "Please verify locally."
+                        )}
+                    </p>
+
+                    <p>
+                        <strong>🏛️ History</strong><br>
+                        ${escapeHTML(
+                            details.history || "Historical information is unavailable."
+                        )}
+                    </p>
+
+                    <p>
+                        <strong>📍 Location</strong><br>
+                        ${details.latitude != null && details.longitude != null
+                            ? `${escapeHTML(details.latitude)}, ${escapeHTML(details.longitude)}`
+                            : "Location coordinates unavailable"}
+                    </p>
+                </div>
+
+                <div class="place-details-links">
+                    ${mapLink}
+                    ${websiteLink}
+                    ${wikipediaLink}
+                </div>
+
+                <div class="place-details-actions">
+                    <button type="button" id="detailsAddToTrip">
+                        ➕ Add to Trip
+                    </button>
+
+                    <button type="button" id="detailsFavorite">
+                        ${isSaved("favoritePlaces", details) ? "♥ Saved" : "♡ Favorite"}
+                    </button>
+                </div>
+
+                <small class="place-details-source">
+                    Source: ${escapeHTML(details.source || "Place information provider")}
+                </small>
+            </div>
+        `;
+
+        $("detailsAddToTrip").addEventListener("click", () => {
+            const added = savePlace("selectedTripPlaces", details);
+            $("detailsAddToTrip").textContent =
+                added ? "✓ Added to Trip" : "➕ Add to Trip";
+        });
+
+        $("detailsFavorite").addEventListener("click", () => {
+            const added = savePlace("favoritePlaces", details);
+            $("detailsFavorite").textContent =
+                added ? "♥ Saved" : "♡ Favorite";
+            renderPlaces();
+        });
+    }
+
+    // Tourist-place loading and rendering are owned exclusively by places.js.
+    // Keep this file focused on trip summary, itinerary controls, weather and routes.
+
+    /* ---------------- MANUAL PLACES + DAY-BY-DAY ITINERARY ---------------- */
+    const manualName = $("manualPlaceName");
+    const manualNotes = $("manualPlaceNotes");
+    const manualButton = $("addManualPlace");
+    const manualStatus = $("manualPlaceStatus");
+
+    if (manualButton) {
+        manualButton.addEventListener("click", () => {
+            const name = (manualName?.value || "").trim();
+            const notes = (manualNotes?.value || "").trim();
+            if (!name) {
+                if (manualStatus) manualStatus.textContent = "Enter a place name first.";
+                return;
+            }
+            const list = readStorage("selectedTripPlaces");
+            const exists = list.some(item => String(item.name || "").toLowerCase() === name.toLowerCase());
+            if (!exists) {
+                list.push({
+                    id: "manual-" + Date.now(),
+                    name,
+                    description: notes || "Added manually by the traveller.",
+                    category: "User-added place",
+                    source: "manual",
+                    image: ""
+                });
+                localStorage.setItem("selectedTripPlaces", JSON.stringify(list));
+            }
+            if (manualStatus) manualStatus.textContent = exists ? "This place is already in your trip." : `${name} added to your trip.`;
+            if (manualName) manualName.value = "";
+            if (manualNotes) manualNotes.value = "";
+        });
+    }
+
+    function makeDayPlan() {
+        const selected = readStorage("selectedTripPlaces");
+        const days = Math.max(1, Number(trip.days) || Math.max(1, Math.ceil(selected.length / 3)));
+        const destination = trip.destination || "your destination";
+        const groups = Array.from({length: days}, () => []);
+        selected.forEach((place, index) => groups[Math.min(days - 1, Math.floor(index * days / Math.max(selected.length, 1)))].push(place));
+        const itinerary = groups.map((places, index) => ({
+            day: index + 1,
+            title: `Day ${index + 1} – ${destination}`,
+            morning: places[0]?.name || `Explore the main attractions of ${destination}`,
+            afternoon: places[1]?.name || "Visit a nearby museum, market or landmark",
+            evening: places[2]?.name || "Enjoy a relaxed local sightseeing walk",
+            lunch: "Choose a well-rated restaurant near the afternoon attraction; verify opening hours before visiting.",
+            dinner: "Choose a well-rated restaurant near your hotel or evening stop.",
+            hotel: "Select accommodation near the next day's first attraction; confirm price and availability directly.",
+            places: places.map(p => p.name)
+        }));
+        return {destination, from_location: trip.from_location || "", days, travellers: trip.travellers || 1, budget: trip.budget || "Flexible", transport: trip.transport || "Not specified", itinerary, selected_places: selected};
+    }
+
+    const planButton = $("generateItinerary");
+    if (planButton) {
+        planButton.addEventListener("click", () => {
+            const plan = makeDayPlan();
+            const defaultName = `${plan.destination} · ${plan.days} day trip`;
+            const tripName = window.prompt("Give this trip a name:", defaultName);
+            if (tripName === null) return;
+            plan.trip_name = tripName.trim() || defaultName;
+            plan.saved_at = new Date().toISOString();
+            plan.requirements = {...trip};
+            localStorage.setItem("generatedTravelItinerary", JSON.stringify(plan));
+            const history = readStorage("travelTripHistory");
+            const snapshot = {
+                id: "trip-" + Date.now(),
+                trip_name: plan.trip_name,
+                from_location: plan.from_location,
+                destination: plan.destination,
+                days: plan.days,
+                requirements: {...trip},
+                places: plan.selected_places,
+                itinerary: plan,
+                saved_at: plan.saved_at
+            };
+            history.push(snapshot);
+            localStorage.setItem("travelTripHistory", JSON.stringify(history));
+            window.location.href = "/itinerary";
+        });
+    }
+
+    /* ---------------- LIVE WEATHER ---------------- */
+
+    async function loadWeather() {
+        const weatherGrid = $("weatherGrid");
+        if (!weatherGrid) return;
+        const currentBox = document.querySelector(".current-weather");
+        weatherGrid.innerHTML = '<p class="places-message">Loading weather forecast...</p>';
+        if (!trip.destination) {
+            weatherGrid.innerHTML = '<p class="places-message">Add a destination to view weather.</p>';
+            return;
+        }
+        try {
+            const response = await fetch(`/api/weather?destination=${encodeURIComponent(trip.destination)}`);
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || "Weather unavailable");
+            const current = data.current || {};
+            const loc = data.location || {};
+            const weatherNames = {0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",45:"Fog",48:"Depositing rime fog",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",61:"Light rain",63:"Rain",65:"Heavy rain",71:"Light snow",73:"Snow",75:"Heavy snow",80:"Rain showers",81:"Rain showers",82:"Heavy rain showers",95:"Thunderstorm",96:"Thunderstorm with hail",99:"Thunderstorm with hail"};
+            const description = weatherNames[current.weather_code] || "Weather conditions";
+            if (currentBox) currentBox.innerHTML = `<div class="weather-icon">🌤️</div><div class="weather-information"><small>CURRENT CONDITIONS · ${escapeHTML([loc.name,loc.admin1].filter(Boolean).join(", "))}</small><h2>${Number(current.temperature_2m).toFixed(1)}°C · ${escapeHTML(description)}</h2><p>Feels like ${current.apparent_temperature}°C · Humidity ${current.relative_humidity_2m}% · Wind ${current.wind_speed_10m} km/h</p></div>`;
+            const daily = data.daily || {};
+            weatherGrid.innerHTML = (daily.time || []).map((date,i) => `<div class="weather-card"><h3>${new Date(date+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})}</h3><div class="weather-symbol">${Number(daily.precipitation_probability_max?.[i]||0)>50?"🌧️":"🌤️"}</div><p>${escapeHTML(weatherNames[daily.weather_code?.[i]] || "Forecast")}</p><strong>${daily.temperature_2m_min?.[i] ?? "—"}°C – ${daily.temperature_2m_max?.[i] ?? "—"}°C</strong><p>Rain chance: ${daily.precipitation_probability_max?.[i] ?? "—"}%</p></div>`).join("");
+        } catch (error) {
+            weatherGrid.innerHTML = `<div class="places-message"><p>🌦️ ${escapeHTML(error.message)}</p><button type="button" id="retryWeather">Try again</button></div>`;
+            $("retryWeather")?.addEventListener("click", loadWeather);
+        }
+    }
+    loadWeather();
+
+    /* ---------------- LIVE ROAD ROUTES ---------------- */
+
+    async function loadRoutes() {
+        const routesGrid = $("routesGrid");
+        if (!routesGrid) return;
+        const from = trip.from_location;
+        const to = trip.destination;
+        if (!from || !to) {
+            routesGrid.innerHTML = '<div class="places-message">Enter both starting location and destination in your trip summary to calculate a route.</div>';
+            return;
+        }
+        const selectedPlaces = readStorage("selectedTripPlaces");
+        const stopNames = selectedPlaces
+            .map(item => item && item.name)
+            .filter(Boolean)
+            .slice(0, 8);
+        routesGrid.innerHTML = '<div class="places-message">Calculating route and turn-by-turn directions...</div>';
+        try {
+            const params = new URLSearchParams({from, to});
+            if (stopNames.length) params.set("stops", stopNames.join("|"));
+            const response = await fetch(`/api/routes?${params.toString()}`);
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || "Route unavailable");
+            routesGrid.innerHTML = (data.routes || []).map((route,index) => {
+                const legs = (route.legs || []).map(leg => {
+                    const important = (leg.steps || []).filter((step, stepIndex) => {
+                        const text = (step.instruction || "").toLowerCase();
+                        return stepIndex === 0 || /turn|roundabout|exit|merge|fork|destination|arrive|u-turn/.test(text)
+                            || (step.distance_text && parseFloat(step.distance_text) >= 5);
+                    });
+                    return `<section class="route-leg">
+                        <h4>${escapeHTML(leg.from)} → ${escapeHTML(leg.to)}</h4>
+                        <p>📏 ${leg.distance_km} km · ⏱️ ${leg.duration_min} min</p>
+                        <details class="route-step-details">
+                            <summary>View major directions (${important.length} steps)</summary>
+                            <ol class="route-directions">
+                                ${important.map(step => `<li><span>${escapeHTML(step.instruction)}</span><small>${escapeHTML(step.distance_text)} · ${escapeHTML(step.duration_text)}</small></li>`).join("")}
+                            </ol>
+                        </details>
+                    </section>`;
+                }).join("");
+                return `<article class="route-card route-card-detailed">
+                    <h3>🚗 Route option ${index+1}</h3>
+                    <p><strong>${escapeHTML(data.from)} → ${escapeHTML(data.to)}</strong></p>
+                    <p>📏 Total distance: ${route.distance_text}</p>
+                    <p>⏱️ Estimated driving time: ${route.duration_text}</p>
+                    <details class="route-full-details">
+                        <summary>View route details</summary>
+                        ${legs || "<p>Detailed road instructions are unavailable for this route.</p>"}
+                    </details>
+                </article>`;
+            }).join("");
+        } catch (error) {
+            routesGrid.innerHTML = `<div class="places-message"><p>🗺️ ${escapeHTML(error.message)}</p><button type="button" id="retryRoutes">Try again</button></div>`;
+            $("retryRoutes")?.addEventListener("click", loadRoutes);
+        }
+    }
+    loadRoutes();
+
+    /* ---------------- MODIFY TRIP ---------------- */
+
+    const continueButton = $("continueButton");
+
+    if (continueButton) {
+        continueButton.addEventListener("click", () => {
+            document.querySelector('[data-tab="routes"]')?.click();
+        });
+    }
+})
+    if (location.hash === "#generateItinerary" && sessionStorage.getItem("profileAutoPlan") === "1") {
+        sessionStorage.removeItem("profileAutoPlan");
+        setTimeout(() => {
+            const button = document.getElementById("generateItinerary");
+            if (button) button.click();
+        }, 700);
+    }
+;

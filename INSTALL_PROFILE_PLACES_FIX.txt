@@ -1,0 +1,22 @@
+Apply to the existing project folder only (do not extract into a nested project directory).
+
+1) Stop Flask with Ctrl+C.
+2) From Terminal:
+   cd ~/Desktop/AI_Travel_Tourism
+   cp static/js/profile.js static/js/profile.js.backup2
+   cp templates/profile.html templates/profile.html.backup2
+   cp app/services/place_service.py app/services/place_service.py.backup2
+3) Extract directly into the project root:
+   unzip -o ~/Downloads/AI_Travel_Tourism_Profile_Places_Fix.zip -d ~/Desktop/AI_Travel_Tourism
+4) Restart:
+   source venv/bin/activate
+   python app.py
+5) In the browser press Ctrl+Shift+R.
+
+Changes:
+- Profile destination groups now span the full available width.
+- Each destination expands inline to show only its selected places.
+- Each destination has its own "Plan this trip" button. It loads that destination's selected places and triggers itinerary generation.
+- Removed the Favorite Places panel and redundant favorite count from Profile.
+- Place service now returns instant curated offline suggestions for supported Indian destinations, avoiding repeated slow Nominatim/Overpass failures. Other destinations still use live providers with shorter timeouts.
+- Existing files are backed up by the commands above.

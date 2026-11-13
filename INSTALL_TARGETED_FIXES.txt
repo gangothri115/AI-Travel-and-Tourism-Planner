@@ -1,0 +1,46 @@
+AI TRAVEL TOURISM — TARGETED FIXES
+=================================
+
+This ZIP intentionally contains ONLY two corrected source files and this note.
+It does NOT contain a nested AI_Travel_Tourism folder.
+
+FILES:
+  app/services/trip_parser.py
+  app/services/place_service.py
+
+INSTALL:
+1. Stop Flask with Ctrl+C.
+2. Make a backup:
+   cd ~/Desktop/AI_Travel_Tourism
+   cp app/services/trip_parser.py app/services/trip_parser.py.backup
+   cp app/services/place_service.py app/services/place_service.py.backup
+
+3. Extract this ZIP directly INTO your existing project folder:
+   unzip -o ~/Downloads/AI_Travel_Tourism_Targeted_Fixes.zip -d ~/Desktop/AI_Travel_Tourism
+
+   If your browser saved it somewhere else, change only the ZIP path above.
+   Do NOT extract it into a new AI_Travel_Tourism folder.
+
+4. Restart:
+   cd ~/Desktop/AI_Travel_Tourism
+   source venv/bin/activate
+   python app.py
+
+5. Refresh the browser with Ctrl+Shift+R.
+
+WHAT THIS FIXES:
+- Destination text is cut off before budget, duration, transport, and planning phrases.
+- Latest explicitly stated route wins over earlier routes in the chat.
+- Budget, days, transport and traveller count are parsed independently.
+- Bare numbers are not automatically interpreted as both budget and travellers.
+- If live OSM search fails or returns no attractions, popular Indian destinations
+  in the included offline catalogue still show attractions.
+- Successful place results are persisted to the server cache.
+
+OFFLINE CATALOGUE:
+Hyderabad, Delhi, Mysore/Mysuru, Tirumala/Tirupati, Araku, Ooty,
+Kadapa, Vijayawada, Visakhapatnam/Vizag, Agra, Jaipur, Bengaluru,
+Chennai, Mumbai, Varanasi and Goa.
+
+For destinations outside this catalogue, live provider access or previously
+cached results are still required. No client can guarantee external provider uptime.

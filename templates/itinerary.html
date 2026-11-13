@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Your Smart Travel Blueprint | AI Travel{% endblock %}
+{% block extra_css %}
+<style>
+.itinerary-page{max-width:1220px;margin:34px auto 70px;padding:0 22px;color:#183451}
+.trip-hero{position:relative;overflow:hidden;border-radius:26px;padding:32px;background:linear-gradient(120deg,#123e68,#246ca0 58%,#7ba9c9);color:#fff;box-shadow:0 18px 45px #173d6326}
+.trip-hero h1{font-size:clamp(28px,4vw,42px);margin:10px 0}.trip-hero p{max-width:760px;line-height:1.55;margin:0;opacity:.94}
+.hero-kicker{font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:.82;font-weight:700}
+.itinerary-meta{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}.itinerary-chip{padding:8px 13px;border-radius:30px;background:#ffffff20;border:1px solid #ffffff35;font-size:13px}
+.itinerary-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:20px 0;flex-wrap:wrap}.itinerary-actions{display:flex;gap:10px;flex-wrap:wrap}
+.itinerary-actions button,.itinerary-actions a{border:0;border-radius:11px;padding:11px 16px;background:#1769a6;color:#fff;text-decoration:none;font-weight:650;cursor:pointer}.itinerary-actions .secondary{background:#eaf2fa;color:#245477}
+.trip-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0}.trip-stat,.day-card,.recommendation-panel{background:#fff;border:1px solid #e2eaf2;border-radius:20px;box-shadow:0 8px 26px #1834510b}.trip-stat{padding:18px}.trip-stat strong{display:block;font-size:25px;color:#1769a6}.trip-stat span{font-size:13px;color:#718398}
+.section-heading{display:flex;align-items:end;justify-content:space-between;margin:30px 2px 14px;gap:12px}.section-heading h2{margin:0;color:#183d60;font-size:24px}.section-heading p{margin:5px 0 0;color:#718398;font-size:13px}
+.day-card{padding:22px;margin-bottom:18px}.day-top{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #edf1f5;padding-bottom:14px;margin-bottom:16px}.day-top h3{margin:0;font-size:20px;color:#174a76}.day-top span{font-size:12px;color:#67829a;background:#eef5fb;padding:7px 11px;border-radius:20px}
+.stop-list{display:grid;gap:0}.stop-row{display:grid;grid-template-columns:54px 1fr auto;gap:13px;align-items:center;padding:15px 4px;border-bottom:1px solid #edf1f5}.stop-row:last-child{border-bottom:0}
+.stop-number{width:42px;height:42px;border-radius:14px;background:#eaf3fb;color:#1769a6;display:grid;place-items:center;font-weight:800}
+.stop-info strong{display:block;font-size:16px;color:#244d70}.stop-info small{display:block;color:#8392a2;margin-top:4px;font-size:12px}
+.stop-map{font-size:12px;font-weight:700;text-decoration:none;color:#1769a6;background:#edf5fc;padding:9px 12px;border-radius:9px;white-space:nowrap}
+.recommendation-panel{padding:22px;margin:22px 0}.recommendation-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.recommendation-card{overflow:hidden;border:1px solid #e2eaf2;border-radius:16px;background:#fff;box-shadow:0 7px 20px #1834510b}
+.business-visual{height:105px;display:grid;place-items:center;background:linear-gradient(135deg,#e5eff8,#f5f8fc);font-size:38px}
+.business-body{padding:14px}.business-body h3{font-size:15px;line-height:1.35;margin:0 0 7px;color:#204d70}.business-body p{font-size:12px;color:#718398;margin:5px 0;line-height:1.45}
+.business-actions{display:flex;gap:7px;margin-top:12px}.business-actions a{font-size:12px;font-weight:700;text-decoration:none;padding:8px 10px;border-radius:8px;background:#edf5fc;color:#1769a6}
+.view-more-wrap{text-align:center;margin-top:18px}.view-more{border:1px solid #cbdced;background:#fff;color:#1769a6;border-radius:10px;padding:10px 22px;font-weight:700;cursor:pointer}.view-more:hover{background:#edf5fc}
+.empty-state{padding:24px;border-radius:15px;background:#f5f9fc;color:#718398;text-align:center;grid-column:1/-1}
+.disclaimer{font-size:12px;color:#8191a0;line-height:1.6;margin:16px 2px}
+@media(max-width:950px){.recommendation-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.recommendation-grid{grid-template-columns:1fr}.trip-stats{grid-template-columns:1fr}.trip-hero{padding:23px}.itinerary-page{padding:0 13px}.day-card,.recommendation-panel{padding:15px}.stop-row{grid-template-columns:42px 1fr}.stop-map{grid-column:2;justify-self:start}.day-top{align-items:flex-start;flex-direction:column}}
+@media print{nav,.itinerary-toolbar,.view-more-wrap{display:none!important}.itinerary-page{margin:0;max-width:none}.trip-hero{background:#eaf2fa!important;color:#183451!important;box-shadow:none}.trip-hero *{color:#183451!important}.day-card,.recommendation-panel{break-inside:avoid;box-shadow:none}}
+</style>
+{% endblock %}
+{% block content %}
+<main class="itinerary-page">
+ <section class="trip-hero">
+  <div class="hero-kicker">AI TRAVEL STUDIO · YOUR PERSONAL TRIP BLUEPRINT</div>
+  <h1 id="tripTitle">Your journey, thoughtfully planned.</h1>
+  <p id="tripIntro">Your selected attractions arranged into a practical route.</p>
+  <div class="itinerary-meta" id="itineraryMeta"></div>
+ </section>
+ <div class="itinerary-toolbar">
+  <div><strong>YOUR TRAVEL OVERVIEW</strong><div style="font-size:13px;color:#7a8da0;margin-top:4px">Your sightseeing stops, arranged in visit order.</div></div>
+  <div class="itinerary-actions"><button type="button" onclick="window.print()">↓ Download / Save PDF</button><a class="secondary" href="/planning">← Edit my trip</a></div>
+ </div>
+ <section class="trip-stats" id="tripStats"></section>
+ <div class="section-heading"><div><h2>🧭 Your day-by-day route</h2><p>Only actual places to visit are shown here.</p></div></div>
+ <div id="itineraryDays"></div>
+ <section class="recommendation-panel">
+  <div class="section-heading" style="margin-top:0"><div><h2>🏨 Recommended places to stay</h2><p>Nearby hotels, guest houses and hostels.</p></div></div>
+  <div id="hotelResults" class="recommendation-grid"><div class="empty-state">Finding nearby stays…</div></div>
+  <div id="hotelMore" class="view-more-wrap"></div>
+ </section>
+ <section class="recommendation-panel">
+  <div class="section-heading" style="margin-top:0"><div><h2>🍽️ Restaurants & cafés nearby</h2><p>Food options around your destination.</p></div></div>
+  <div id="restaurantResults" class="recommendation-grid"><div class="empty-state">Finding nearby restaurants…</div></div>
+  <div id="restaurantMore" class="view-more-wrap"></div>
+ </section>
+ <p class="disclaimer">Nearby listings are sourced from OpenStreetMap when available. Distances are approximate. Prices, ratings, opening hours and booking availability are not assumed; please confirm them with the business.</p>
+</main>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/itinerary.js') }}?v=7" defer></script>
+{% endblock %}

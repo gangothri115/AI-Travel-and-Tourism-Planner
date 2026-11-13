@@ -1,0 +1,108 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const read = key => { try { const v=JSON.parse(localStorage.getItem(key)||"[]"); return Array.isArray(v)?v:[]; } catch { return []; } };
+  const byId=id=>document.getElementById(id);
+  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const selected=read("selectedTripPlaces");
+  if(byId("profileSelectedCount")) byId("profileSelectedCount").textContent=selected.length;
+  const findImage=place=>{
+    if(place?.image)return place.image;
+    for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k?.startsWith("aiTravelPlacesCache:"))continue;try{const data=JSON.parse(localStorage.getItem(k)||"{}");const found=(data.places||[]).find(x=>(x.name||"").toLowerCase()===(place?.name||"").toLowerCase());if(found?.image)return found.image;}catch{}}
+    return "";
+  };
+  const selectedList=byId("profileSelectedList");
+  if(selectedList){
+    selectedList.innerHTML="";
+    if(!selected.length) selectedList.innerHTML='<p class="profile-empty">No places added yet. Add places from your trip planner.</p>';
+    else {
+      const groups=new Map();
+      selected.forEach(place=>{
+        const destination=String(place.destination||"Unassigned destination").trim()||"Unassigned destination";
+        const key=destination.toLocaleLowerCase();
+        if(!groups.has(key)) groups.set(key,{destination,places:[]});
+        groups.get(key).places.push(place);
+      });
+      groups.forEach(({destination,places})=>{
+        const group=document.createElement("section");
+        group.className="profile-destination-group";
+        const groupId="destination-"+Math.random().toString(36).slice(2,10);
+        group.innerHTML=`
+          <button type="button" class="profile-destination-toggle" aria-expanded="true" aria-controls="${groupId}">
+            <span class="profile-destination-title"><small>YOUR SAVED TRIP</small><strong>${esc(destination)}</strong><em>${places.length} ${places.length===1?"place":"places"}</em></span>
+            <span class="profile-expand-icon" aria-hidden="true">−</span>
+          </button>
+          <div class="profile-destination-content" id="${groupId}">
+            <div class="profile-destination-places"></div>
+            <div class="profile-destination-footer">
+              <span>${places.length} selected ${places.length===1?"place":"places"} for ${esc(destination)}</span>
+              <div class="profile-trip-buttons">
+                <button type="button" class="profile-add-destination">＋ Add Places</button>
+                <button type="button" class="profile-plan-destination">Plan This Trip →</button>
+                <button type="button" class="profile-remove-destination">Remove Trip</button>
+              </div>
+            </div>
+          </div>`;
+        const toggle=group.querySelector(".profile-destination-toggle");
+        const content=group.querySelector(".profile-destination-content");
+        toggle.addEventListener("click",()=>{
+          const opening=content.hidden; content.hidden=!opening;
+          toggle.setAttribute("aria-expanded",String(opening));
+          group.querySelector(".profile-expand-icon").textContent=opening?"−":"＋";
+        });
+        const grid=group.querySelector(".profile-destination-places");
+        places.forEach(place=>{
+          const card=document.createElement("article"); card.className="profile-selected-place";
+          const image=findImage(place);
+          card.innerHTML=`
+            <div class="profile-selected-image">${image?`<img src="${esc(image)}" alt="${esc(place.name||"Place")}" loading="lazy" onerror="this.remove()">`:'<span>🏞️</span>'}</div>
+            <div class="profile-selected-copy"><h3>${esc(place.name||"Saved place")}</h3><p>${esc(place.category||"Attraction")}</p>
+              <div class="profile-place-actions"><button type="button" class="remove-place">Remove Place</button></div>
+            </div>`;
+          card.querySelector(".remove-place").addEventListener("click",()=>{
+            const all=read("selectedTripPlaces");
+            const index=all.findIndex(x=>String(x.name||"").toLowerCase()===String(place.name||"").toLowerCase() && String(x.destination||"").toLowerCase()===destination.toLowerCase());
+            if(index>=0) all.splice(index,1);
+            localStorage.setItem("selectedTripPlaces",JSON.stringify(all)); location.reload();
+          });
+          grid.append(card);
+        });
+        const prepareTrip=()=>{
+          let current={}; try{current=JSON.parse(sessionStorage.getItem("tripRequirements")||"{}")}catch{}
+          const requirements={...current,destination,places,selected_places:places};
+          sessionStorage.setItem("tripRequirements",JSON.stringify(requirements));
+          localStorage.setItem("selectedTripPlaces",JSON.stringify(places));
+          sessionStorage.removeItem("tripHistorySavedForCurrentPlan");
+          return requirements;
+        };
+        group.querySelector(".profile-plan-destination").addEventListener("click",()=>{
+          prepareTrip(); sessionStorage.setItem("profileAutoPlan","1");
+          location.href="/planning#generateItinerary";
+        });
+        group.querySelector(".profile-add-destination").addEventListener("click",()=>{
+          prepareTrip(); sessionStorage.removeItem("profileAutoPlan");
+          location.href="/planning?destination="+encodeURIComponent(destination);
+        });
+        group.querySelector(".profile-remove-destination").addEventListener("click",()=>{
+          if(!confirm(`Remove the entire ${destination} trip and all its selected places?`)) return;
+          const all=read("selectedTripPlaces").filter(x=>String(x.destination||"").toLowerCase()!==destination.toLowerCase());
+          localStorage.setItem("selectedTripPlaces",JSON.stringify(all)); location.reload();
+        });
+        selectedList.append(group);
+      });
+    }
+  }
+  document.querySelectorAll(".stat-link[data-target]").forEach(button=>button.addEventListener("click",()=>{
+    const panel=document.getElementById(button.dataset.target); if(panel)panel.scrollIntoView({behavior:"smooth",block:"start"});
+  }));
+  // Start a genuinely new chatbot session without deleting saved destination groups.
+  const newTrip=byId("profileNewTrip");
+  if(newTrip) newTrip.addEventListener("click",()=>{
+    sessionStorage.removeItem("travelConversation");
+    sessionStorage.removeItem("tripRequirements");
+    sessionStorage.removeItem("initialTravelMessage");
+    sessionStorage.removeItem("profileAutoPlan");
+    sessionStorage.removeItem("tripHistorySavedForCurrentPlan");
+    window.location.href="/chat";
+  });
+  const clear=byId("clearTripHistory");
+  if(clear)clear.addEventListener("click",()=>{if(confirm("Clear saved trip history from this browser?")){localStorage.removeItem("travelTripHistory");alert("Saved trip history cleared. Your selected places have not been deleted.");}});
+});

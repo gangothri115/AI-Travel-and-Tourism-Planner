@@ -1,0 +1,18 @@
+PROFILE PAGE PATCH — INSTALLATION
+
+This is a targeted patch, not a complete project.
+1. Stop Flask (Ctrl+C in the terminal).
+2. Open your EXISTING project folder: ~/Desktop/AI_Travel_Tourism
+3. Extract this ZIP directly INTO that folder.
+4. When prompted, choose Replace for the two files.
+5. Start Flask again:
+   cd ~/Desktop/AI_Travel_Tourism
+   source venv/bin/activate
+   python app.py
+6. Open /profile and press Ctrl+Shift+R.
+
+The ZIP contains only:
+- templates/profile.html
+- static/js/profile.js
+
+It does not contain another project folder, .env, or venv.

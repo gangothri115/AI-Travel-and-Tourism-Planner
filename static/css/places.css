@@ -1,0 +1,631 @@
+/* =====================================================
+   TOURIST PLACE CARDS AND DETAILS
+   Light mode by default; dark mode supported.
+===================================================== */
+
+.places-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.real-place-card {
+    min-width: 0;
+    overflow: hidden;
+    background: var(--surface, #ffffff);
+    color: var(--text, #172033);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.real-place-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+}
+
+.real-place-image {
+    height: 190px;
+    overflow: hidden;
+    background: var(--background, #f5f7fb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+}
+
+.real-place-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.real-place-image {
+    height: 190px;
+    min-height: 190px;
+    position: relative;
+}
+
+.real-place-image img {
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.place-photo-loading,
+.place-photo-unavailable {
+    width: 100%;
+    height: 190px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #eef2f7;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.place-photo-unavailable { font-size: 30px; }
+.place-photo-unavailable span { font-size: 12px; }
+.place-photo-loading {
+    background: linear-gradient(90deg, #edf1f6 25%, #f8fafc 50%, #edf1f6 75%);
+    background-size: 200% 100%;
+    animation: placePhotoShimmer 1.4s infinite;
+}
+@keyframes placePhotoShimmer { to { background-position: -200% 0; } }
+
+.real-place-image.no-place-image {
+    color: var(--muted, #64748b);
+}
+
+.real-place-content {
+    padding: 17px;
+}
+
+.real-place-content h3 {
+    color: var(--text, #172033);
+    font-size: 17px;
+    line-height: 1.4;
+    margin: 0 0 9px;
+    overflow-wrap: anywhere;
+}
+
+.real-place-location,
+.real-place-timing {
+    color: var(--muted, #64748b);
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 5px 0;
+}
+
+.real-place-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 16px;
+}
+
+.place-heart-button,
+.place-add-button {
+    min-height: 42px;
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 11px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 650;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.place-heart-button {
+    flex: 0 0 44px;
+    width: 44px;
+    color: var(--text, #172033);
+    background: var(--surface, #ffffff);
+    font-size: 23px;
+    line-height: 1;
+}
+
+.place-heart-button.is-favorite {
+    color: #ef4444;
+    background: #fff1f2;
+    border-color: #fecdd3;
+}
+
+.place-add-button {
+    flex: 1;
+    padding: 9px 12px;
+    color: #ffffff;
+    background: #2563eb;
+    border-color: #2563eb;
+    font-size: 13px;
+}
+
+.place-add-button:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.place-add-button.is-added {
+    color: #166534;
+    background: #dcfce7;
+    border-color: #bbf7d0;
+}
+
+.places-status {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 22px;
+    color: var(--muted, #64748b);
+    background: var(--background, #f5f7fb);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 14px;
+    line-height: 1.6;
+}
+
+/* =====================================================
+   PLACE DETAILS MODAL
+===================================================== */
+
+.place-modal-open {
+    overflow: hidden;
+}
+
+.place-details-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    padding: 22px;
+    overflow-y: auto;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.65);
+}
+
+.place-details-modal.is-open {
+    display: flex;
+}
+
+.place-details-panel {
+    position: relative;
+    width: 100%;
+    max-width: 760px;
+    max-height: calc(100vh - 44px);
+    overflow-y: auto;
+    background: var(--surface, #ffffff);
+    color: var(--text, #172033);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 20px;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+}
+
+.place-details-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 50%;
+    background: var(--surface, #ffffff);
+    color: var(--text, #172033);
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.place-details-image {
+    display: block;
+    width: 100%;
+    max-height: 330px;
+    object-fit: cover;
+    background: var(--background, #f5f7fb);
+}
+
+.place-details-image-fallback {
+    min-height: 180px;
+    display: grid;
+    place-items: center;
+    font-size: 65px;
+    background: var(--background, #f5f7fb);
+}
+
+.place-details-content {
+    padding: 24px;
+}
+
+.place-details-eyebrow {
+    margin: 0 0 8px;
+    color: var(--primary, #2563eb);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}
+
+.place-details-content h2 {
+    margin: 0 0 8px;
+    color: var(--text, #172033);
+    font-size: 27px;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.place-details-location {
+    color: var(--muted, #64748b);
+    font-size: 14px;
+}
+
+.place-fact-section {
+    margin-top: 22px;
+}
+
+.place-fact-section h3 {
+    margin: 0 0 8px;
+    color: var(--text, #172033);
+    font-size: 16px;
+}
+
+.place-fact-section p {
+    margin: 0;
+    color: var(--muted, #64748b);
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.place-detail-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.place-detail-links a {
+    color: var(--primary, #2563eb);
+    font-size: 14px;
+    font-weight: 650;
+    text-decoration: none;
+}
+
+.place-detail-links a:hover {
+    text-decoration: underline;
+}
+
+.place-details-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.place-details-actions .place-heart-button {
+    flex: 0 0 auto;
+    width: auto;
+    padding: 9px 14px;
+    font-size: 14px;
+}
+
+.place-details-actions .place-add-button {
+    flex: 1;
+}
+
+.place-source-note {
+    margin: 18px 0 0;
+    color: var(--muted, #64748b);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* =====================================================
+   DARK MODE
+   Support the theme class names used in the project.
+===================================================== */
+
+body.dark-theme .real-place-card,
+body.dark-mode .real-place-card,
+body[data-theme="dark"] .real-place-card {
+    background: var(--surface, #1e293b);
+    color: var(--text, #f8fafc);
+    border-color: var(--border, #334155);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+body.dark-theme .real-place-content h3,
+body.dark-mode .real-place-content h3,
+body[data-theme="dark"] .real-place-content h3,
+body.dark-theme .place-details-content h2,
+body.dark-mode .place-details-content h2,
+body[data-theme="dark"] .place-details-content h2,
+body.dark-theme .place-fact-section h3,
+body.dark-mode .place-fact-section h3,
+body[data-theme="dark"] .place-fact-section h3 {
+    color: var(--text, #f8fafc);
+}
+
+body.dark-theme .real-place-image,
+body.dark-mode .real-place-image,
+body[data-theme="dark"] .real-place-image,
+body.dark-theme .places-status,
+body.dark-mode .places-status,
+body[data-theme="dark"] .places-status,
+body.dark-theme .place-details-image-fallback,
+body.dark-mode .place-details-image-fallback,
+body[data-theme="dark"] .place-details-image-fallback {
+    background: var(--background, #0f172a);
+}
+
+body.dark-theme .place-heart-button,
+body.dark-mode .place-heart-button,
+body[data-theme="dark"] .place-heart-button,
+body.dark-theme .place-details-close,
+body.dark-mode .place-details-close,
+body[data-theme="dark"] .place-details-close {
+    color: var(--text, #f8fafc);
+    background: var(--surface, #1e293b);
+    border-color: var(--border, #334155);
+}
+
+body.dark-theme .place-heart-button.is-favorite,
+body.dark-mode .place-heart-button.is-favorite,
+body[data-theme="dark"] .place-heart-button.is-favorite {
+    color: #fb7185;
+    background: #3b1723;
+    border-color: #7f1d1d;
+}
+
+body.dark-theme .place-add-button.is-added,
+body.dark-mode .place-add-button.is-added,
+body[data-theme="dark"] .place-add-button.is-added {
+    color: #bbf7d0;
+    background: #123323;
+    border-color: #166534;
+}
+
+body.dark-theme .place-details-panel,
+body.dark-mode .place-details-panel,
+body[data-theme="dark"] .place-details-panel {
+    color: var(--text, #f8fafc);
+    background: var(--surface, #1e293b);
+    border-color: var(--border, #334155);
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 900px) {
+    .places-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .real-place-image {
+        height: 175px;
+    }
+}
+
+@media (max-width: 600px) {
+    .places-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .real-place-image {
+        height: 210px;
+    }
+
+    .real-place-content {
+        padding: 15px;
+    }
+
+    .place-details-modal {
+        padding: 10px;
+        align-items: flex-end;
+    }
+
+    .place-details-panel {
+        max-height: calc(100vh - 20px);
+        border-radius: 18px;
+    }
+
+    .place-details-content {
+        padding: 18px;
+    }
+
+    .place-details-content h2 {
+        font-size: 22px;
+    }
+
+    .place-details-actions {
+        flex-wrap: wrap;
+    }
+
+    .place-details-actions .place-add-button {
+        min-width: 130px;
+    }
+}
+
+/* ==========================================
+   PLACES LOADING SPINNER
+========================================== */
+
+#placesGrid .places-status {
+    grid-column: 1 / -1;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 30px 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #ffffff;
+    color: #172033;
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+#placesGrid .places-status.is-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    min-height: 150px;
+}
+
+.places-loading-spinner {
+    width: 42px;
+    height: 42px;
+    box-sizing: border-box;
+    border: 4px solid #dbeafe;
+    border-top-color: #2563eb;
+    border-right-color: #6366f1;
+    border-radius: 50%;
+    animation: places-spin 0.8s linear infinite;
+}
+
+@keyframes places-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Dark theme */
+body.dark-theme #placesGrid .places-status,
+body[data-theme="dark"] #placesGrid .places-status,
+body.dark-mode #placesGrid .places-status {
+    background: #111827 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+body.dark-theme .places-loading-spinner,
+body[data-theme="dark"] .places-loading-spinner,
+body.dark-mode .places-loading-spinner {
+    border-color: #334155;
+    border-top-color: #60a5fa;
+    border-right-color: #818cf8;
+}
+
+/* Light theme */
+body:not(.dark-theme):not(.dark-mode):not([data-theme="dark"])
+#placesGrid .places-status {
+    background: #ffffff;
+    color: #172033;
+    border-color: #e2e8f0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .places-loading-spinner {
+        animation-duration: 2s;
+    }
+}
+
+
+/* ==========================================
+   PLACE DETAILS BUTTON
+========================================== */
+
+.real-place-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #ffffff;
+    color: #172033;
+}
+
+.real-place-content h3 {
+    margin: 0;
+    color: #172033;
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+.real-place-timing {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #64748b;
+}
+
+.real-place-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+}
+
+.real-place-actions .place-heart-button {
+    flex: 0 0 44px;
+    min-width: 44px;
+}
+
+.real-place-actions .place-add-button {
+    flex: 1;
+    min-width: 0;
+}
+
+.place-details-button {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.place-details-button:hover {
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
+@media (max-width: 480px) {
+    .real-place-content {
+        padding: 14px;
+    }
+
+    .real-place-content h3 {
+        font-size: 16px;
+    }
+
+    .real-place-actions {
+        gap: 7px;
+    }
+}
+
+/* Famous and scenic discovery sections */
+.place-results-group-heading {
+  grid-column: 1 / -1; margin: 26px 0 8px; font-size: 1.35rem;
+  font-weight: 750; color: var(--text-primary, #172033);
+}
+.place-type-badge { display: inline-flex; width: fit-content; margin-bottom: 8px;
+  padding: 5px 10px; border-radius: 999px; font-size: .75rem; font-weight: 700;
+  background: #eef4ff; color: #244f9e; }
+.real-place-image { position: relative; overflow: hidden; }
+.real-place-image img { width: 100%; height: 100%; min-height: 190px; object-fit: cover; display: block; }
+
+
+/* Small, accessible source credit for locally cached attraction photographs. */
+.real-place-image { position: relative; }
+.place-image-attribution {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    z-index: 2;
+    padding: 4px 7px;
+    border-radius: 6px;
+    background: rgba(15, 23, 42, .78);
+    color: #fff;
+    font-size: 10px;
+    line-height: 1.3;
+    text-decoration: none;
+}
+.place-image-attribution:hover { background: rgba(15, 23, 42, .95); color: #fff; }

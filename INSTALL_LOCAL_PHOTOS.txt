@@ -1,0 +1,52 @@
+AI TRAVEL TOURISM — LOCAL PHOTO DOWNLOAD PATCH
+================================================
+
+This patch updates:
+- app/services/place_service.py
+- static/js/places.js
+- static/css/places.css
+
+What it does:
+1. Searches Wikipedia for an exact-title article photo.
+2. Searches Wikimedia Commons using the attraction name plus destination and
+   India/Andhra Pradesh context.
+3. Ranks candidate files by title relevance. It does not simply use the first
+   search result.
+4. Downloads the selected image into:
+   static/uploads/place_photos/
+5. Returns the local /static/uploads/place_photos/... URL to the attraction card.
+6. Stores a persistent index in instance/place_photo_index.json so downloaded
+   photos are reused after Flask restarts.
+7. Retries missing-photo searches after 15 minutes.
+8. Shows a small "Photo source" link on cards when a source page is available.
+9. Removes duplicate browser-side Wikimedia requests.
+
+INSTALL
+-------
+1. Stop Flask (Ctrl+C).
+2. From the OUTER project root, back up the files:
+   cp app/services/place_service.py app/services/place_service.py.pre_local_photos
+   cp static/js/places.js static/js/places.js.pre_local_photos
+   cp static/css/places.css static/css/places.css.pre_local_photos
+3. Extract this ZIP into:
+   ~/Desktop/AI_Travel_Tourism
+   Preserve the folder paths and allow the three files to be replaced.
+4. Ensure the Flask process can write to the project folder:
+   mkdir -p static/uploads/place_photos instance
+5. Restart:
+   source venv/bin/activate
+   python app.py
+6. In Chrome press Ctrl+Shift+R and search the destination again.
+
+IMPORTANT
+---------
+- This uses free Wikipedia/Wikimedia endpoints; no Google Places billing or new
+  API key is required.
+- Only images returned by these providers and successfully downloaded as image
+  files are used. A source link is included on each photo card.
+- No system can guarantee a legally reusable image exists for every obscure
+  attraction. If no matching file is indexed by the free sources, that card
+  remains without a photo rather than displaying an unrelated image.
+- The first search can take longer because photographs are downloaded. Later
+  searches use local copies.
+- No .env, API keys, venv, or database files are included.

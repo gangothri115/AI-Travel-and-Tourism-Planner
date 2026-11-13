@@ -1,0 +1,22 @@
+templates/base.html:74:            <!-- FAVORITES -->
+templates/base.html:76:            <a href="/favorites"
+templates/base.html:84:                    Favorites
+templates/base.html:90:            <!-- PROFILE -->
+templates/base.html:92:            <a href="/profile"
+templates/base.html:95:                <span class="profile-nav-icon">
+templates/base.html:100:                    Profile
+templates/base.html:173:            Intelligent travel planning powered by AI
+app.py:32:@app.route("/profile")
+app.py:33:def profile():
+app.py:34:    return render_template("profile.html")
+app/routes/chat.py:25:# PLANNING PAGE
+app/routes/chat.py:28:@chat_bp.route("/planning")
+app/routes/chat.py:29:def planning_page():
+app/routes/chat.py:31:    return render_template("planning.html")
+app/routes/favorite_routes.py:5:# FAVORITES BLUEPRINT
+app/routes/favorite_routes.py:15:# FAVORITES PAGE
+app/routes/favorite_routes.py:18:@favorite_bp.route("/favorites")
+app/routes/favorite_routes.py:19:def favorites_page():
+app/routes/favorite_routes.py:22:        "favorites.html"
+app/ai/chatbot.py:45:- Do not force travel planning unless the user asks for it.
+app/ai/chatbot.py:141:    Supports normal conversations as well as travel planning.

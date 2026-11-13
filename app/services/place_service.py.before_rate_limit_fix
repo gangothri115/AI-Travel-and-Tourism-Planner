@@ -1,0 +1,558 @@
+"""Geoapify-backed Indian destination and nearby-place discovery.
+
+The API key is read only by the Flask backend from GEOAPIFY_API_KEY.
+No manually curated destination catalogue is used.
+"""
+import os
+import re
+import time
+import json
+import hashlib
+import mimetypes
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from threading import Lock
+from urllib.parse import quote
+
+import requests
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+
+API_KEY = os.getenv("GEOAPIFY_API_KEY", "").strip()
+BASE = "https://api.geoapify.com"
+SESSION = requests.Session()
+SESSION.headers.update({"User-Agent": "AITravelTourismStudentProject/1.0"})
+CACHE_TTL = 24 * 60 * 60
+PHOTO_CACHE_TTL = 30 * 24 * 60 * 60
+PHOTO_MISS_TTL = 15 * 60
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PHOTO_DIR = PROJECT_ROOT / "static" / "uploads" / "place_photos"
+PHOTO_INDEX = PROJECT_ROOT / "instance" / "place_photo_index.json"
+_CACHE = {}
+_PHOTO_CACHE = {}
+_DETAIL_CACHE = {}
+_PHOTO_INDEX_LOCK = Lock()
+
+
+def _clean(value):
+    return re.sub(r"\s+", " ", str(value or "")).strip()
+
+
+def _cache_get(key):
+    entry = _CACHE.get(key)
+    if entry and time.time() - entry["saved_at"] < CACHE_TTL:
+        return entry["data"]
+    return None
+
+
+def _cache_set(key, data):
+    _CACHE[key] = {"saved_at": time.time(), "data": data}
+
+
+def _require_key():
+    if not API_KEY:
+        raise RuntimeError(
+            "GEOAPIFY_API_KEY is not configured. Add it to the project's .env file."
+        )
+
+
+
+def geocode_india(destination):
+    """Resolve Indian destinations, preferring the correct locality and state."""
+    _require_key()
+    destination = _clean(destination)
+    if not destination:
+        return None
+
+    normalized = destination.casefold().strip()
+
+    # Correct common spelling variations for Tirumala.
+    if normalized in ("tirumala", "thirumala", "thirumalai"):
+        queries = ["Tirumala, Tirupati, Andhra Pradesh, India"]
+        expected_locality = "tirumala"
+    else:
+        queries = [f"{destination}, India"]
+        expected_locality = normalized
+
+    # Versioned cache prevents old incorrect coordinates being reused.
+    cache_key = "geo:v2:" + normalized
+    cached = _cache_get(cache_key)
+    if cached:
+        return cached
+
+    candidates = []
+
+    for query in queries:
+        response = SESSION.get(
+            f"{BASE}/v1/geocode/search",
+            params={
+                "text": query,
+                "filter": "countrycode:in",
+                "bias": "countrycode:in",
+                "format": "json",
+                "limit": 10,
+                "apiKey": API_KEY,
+            },
+            timeout=(4, 12),
+        )
+        response.raise_for_status()
+
+        results = response.json().get("results", [])
+        for item in results:
+            if str(item.get("country_code", "")).lower() != "in":
+                continue
+
+            state = (item.get("state") or "").casefold()
+            formatted = (item.get("formatted") or "").casefold()
+            name = (item.get("name") or "").casefold()
+            county = (item.get("county") or "").casefold()
+            city = (item.get("city") or "").casefold()
+
+            score = float(item.get("rank", {}).get("confidence", 0) or 0)
+
+            if normalized in ("tirumala", "thirumala", "thirumalai"):
+                if "andhra pradesh" not in state:
+                    continue
+                score += 100
+                if "tirumala" in name:
+                    score += 100
+                if "tirumala" in formatted:
+                    score += 50
+                if "tirupati" in county or "tirupati" in city:
+                    score += 20
+
+            candidates.append((score, item))
+
+    if not candidates:
+        return None
+
+    candidates.sort(key=lambda pair: pair[0], reverse=True)
+    item = candidates[0][1]
+
+    location = {
+        "name": item.get("name") or destination,
+        "formatted": item.get("formatted") or destination,
+        "latitude": float(item["lat"]),
+        "longitude": float(item["lon"]),
+        "country": "India",
+        "country_code": "in",
+        "state": item.get("state") or "",
+        "city": item.get("city") or item.get("county") or item.get("name") or destination,
+    }
+
+    _cache_set(cache_key, location)
+    print("GEOCODE SELECTED:", location)
+    return location
+
+
+def _geoapify_places(location, categories, limit=50, radius=15000):
+    _require_key()
+    lat, lon = location["latitude"], location["longitude"]
+    response = SESSION.get(
+        f"{BASE}/v2/places",
+        params={
+            "categories": categories,
+            "filter": f"circle:{lon},{lat},{radius}",
+            "bias": f"proximity:{lon},{lat}",
+            "limit": limit,
+            "apiKey": API_KEY,
+        },
+        timeout=(4, 18),
+    )
+    response.raise_for_status()
+    return response.json().get("features", [])
+
+
+def _normalize_feature(feature, destination):
+    props = feature.get("properties") or {}
+    coords = (feature.get("geometry") or {}).get("coordinates") or []
+    if len(coords) < 2 or not props.get("name"):
+        return None
+    lon, lat = coords[0], coords[1]
+    country_code = str(props.get("country_code") or "").casefold()
+    country_name = str(props.get("country") or "").casefold()
+    if country_code and country_code != "in":
+        return None
+    if country_name and country_name != "india":
+        return None
+    cats = props.get("categories") or []
+    category = next((c.split(".")[-1].replace("_", " ").title() for c in cats), "Attraction")
+    name = _clean(props.get("name"))
+    cat_text = " ".join(cats).casefold()
+    famous_terms = ("tourism.attraction", "tourism.sights", "heritage", "historic", "place_of_worship", "museum", "monument", "castle", "fort")
+    scenic_terms = ("natural", "water", "beach", "park", "garden", "forest", "mountain", "viewpoint", "lake", "waterfall")
+    place_type = "Famous Place" if any(term in cat_text for term in famous_terms) else ("Beautiful Place" if any(term in cat_text for term in scenic_terms) else "Attraction")
+    place_id = props.get("place_id") or f"{lat}:{lon}:{name}"
+    map_url = (
+        f"https://www.openstreetmap.org/?mlat={lat}&mlon={lon}"
+        f"#map=17/{lat}/{lon}"
+    )
+    return {
+        "id": "geoapify:" + str(place_id),
+        "name": name,
+        "category": category,
+        "place_type": place_type,
+        "latitude": float(lat),
+        "longitude": float(lon),
+        "image": "",
+        "description": _clean(props.get("description") or props.get("formatted") or ""),
+        "opening_hours": _clean(props.get("opening_hours")),
+        "website": props.get("website") or "",
+        "phone": props.get("datasource", {}).get("raw", {}).get("phone", ""),
+        "wikipedia_url": "",
+        "map_url": map_url,
+        "articleURL": map_url,
+        "destination": destination,
+        "source": "Geoapify Places / OpenStreetMap",
+        "distance_km": round(float(props.get("distance", 0) or 0) / 1000, 1)
+            if props.get("distance") is not None else None,
+    }
+
+
+
+def _photo_normalize(value):
+    """Normalize attraction/file names for conservative matching."""
+    value = re.sub(r"\.(jpg|jpeg|png|webp|tif|tiff)$", "", _clean(value), flags=re.I)
+    return re.sub(r"[^a-z0-9]+", " ", value.casefold()).strip()
+
+
+def _photo_index_read():
+    try:
+        if PHOTO_INDEX.exists():
+            return json.loads(PHOTO_INDEX.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        pass
+    return {}
+
+
+def _photo_index_write(index):
+    try:
+        PHOTO_INDEX.parent.mkdir(parents=True, exist_ok=True)
+        temp = PHOTO_INDEX.with_suffix(".tmp")
+        temp.write_text(json.dumps(index, ensure_ascii=False, indent=2), encoding="utf-8")
+        temp.replace(PHOTO_INDEX)
+    except OSError as exc:
+        print("PHOTO INDEX SAVE ERROR:", exc)
+
+
+
+def _photo_index_write_entry(key, entry):
+    """Merge one worker's result safely into the persistent JSON index."""
+    with _PHOTO_INDEX_LOCK:
+        index = _photo_index_read()
+        index[key] = entry
+        _photo_index_write(index)
+
+
+def _download_photo(image_url, place_name, source_page, license_name=""):
+    """Download a real image to static/uploads and return its local URL."""
+    if not image_url or not image_url.startswith("https://"):
+        return ""
+    try:
+        response = SESSION.get(image_url, timeout=(4, 15), stream=True, allow_redirects=True)
+        try:
+            if response.status_code != 200:
+                return ""
+            content_type = response.headers.get("Content-Type", "").split(";")[0].lower()
+            extension = mimetypes.guess_extension(content_type) or ""
+            if extension not in (".jpg", ".jpeg", ".png", ".webp"):
+                return ""
+            PHOTO_DIR.mkdir(parents=True, exist_ok=True)
+            digest = hashlib.sha256((image_url + "|" + place_name).encode("utf-8")).hexdigest()[:24]
+            filename = digest + extension
+            destination = PHOTO_DIR / filename
+            if not destination.exists():
+                total = 0
+                with destination.open("wb") as output:
+                    for chunk in response.iter_content(chunk_size=64 * 1024):
+                        if not chunk:
+                            continue
+                        total += len(chunk)
+                        if total > 10 * 1024 * 1024:
+                            output.close()
+                            destination.unlink(missing_ok=True)
+                            return ""
+                        output.write(chunk)
+            if destination.stat().st_size < 2048:
+                destination.unlink(missing_ok=True)
+                return ""
+            return "/static/uploads/place_photos/" + filename
+        finally:
+            response.close()
+    except (requests.RequestException, OSError) as exc:
+        print("PHOTO DOWNLOAD ERROR:", place_name, exc)
+        return ""
+
+
+def _commons_candidates(name, destination):
+    """Search Commons with several contextual queries and rank matching files."""
+    clean_name = _clean(name)
+    wanted_tokens = set(_photo_normalize(clean_name).split())
+    if not wanted_tokens:
+        return []
+    queries = [
+        f'"{clean_name}" "{destination}" India',
+        f'"{clean_name}" India',
+        f'{clean_name} {destination} Andhra Pradesh India',
+    ]
+    candidates = {}
+    for query in queries:
+        try:
+            response = SESSION.get(
+                "https://commons.wikimedia.org/w/api.php",
+                params={
+                    "action": "query", "generator": "search",
+                    "gsrsearch": query, "gsrnamespace": 6, "gsrlimit": 15,
+                    "prop": "imageinfo", "iiprop": "url|extmetadata",
+                    "iiurlwidth": 1100, "format": "json",
+                },
+                headers={"Accept": "application/json"},
+                timeout=(4, 12),
+            )
+            response.raise_for_status()
+            pages = ((response.json().get("query") or {}).get("pages") or {}).values()
+        except (requests.RequestException, ValueError) as exc:
+            print("COMMONS SEARCH ERROR:", clean_name, exc)
+            continue
+
+        for page in pages:
+            title = page.get("title", "")
+            title_norm = _photo_normalize(title)
+            title_tokens = set(title_norm.split())
+            overlap = len(wanted_tokens & title_tokens)
+            if title_norm == _photo_normalize(clean_name):
+                score = 100 + overlap
+            elif _photo_normalize(clean_name) in title_norm:
+                score = 80 + overlap
+            elif len(wanted_tokens) >= 2 and overlap >= 2:
+                score = 30 + overlap
+            elif len(wanted_tokens) == 1 and overlap == 1 and len(next(iter(wanted_tokens))) >= 7:
+                score = 15
+            else:
+                continue
+
+            info = (page.get("imageinfo") or [{}])[0]
+            image_url = info.get("thumburl") or info.get("url") or ""
+            if not image_url:
+                continue
+            metadata = info.get("extmetadata") or {}
+            license_name = (metadata.get("LicenseShortName") or {}).get("value", "")
+            source_page = "https://commons.wikimedia.org/wiki/" + quote(title.replace(" ", "_"), safe="()_,.-")
+            old = candidates.get(image_url)
+            if old is None or score > old[0]:
+                candidates[image_url] = (score, image_url, source_page, license_name)
+    return sorted(candidates.values(), key=lambda item: item[0], reverse=True)
+
+
+def _wikipedia_candidate(name):
+    title = _clean(name).replace(" ", "_")
+    if not title:
+        return None
+    try:
+        response = SESSION.get(
+            "https://en.wikipedia.org/api/rest_v1/page/summary/" + quote(title, safe="()_,.-"),
+            params={"redirect": "true"},
+            headers={"Accept": "application/json"},
+            timeout=(4, 9),
+        )
+        if not response.ok:
+            return None
+        data = response.json()
+        requested = _photo_normalize(name)
+        resolved = _photo_normalize(data.get("title", ""))
+        # Require a strong article-title match and reject disambiguation.
+        if data.get("type") == "disambiguation" or not (
+            resolved == requested or (len(requested.split()) >= 2 and requested in resolved)
+        ):
+            return None
+        image = (data.get("thumbnail") or {}).get("source") or (data.get("originalimage") or {}).get("source") or ""
+        page_url = ((data.get("content_urls") or {}).get("desktop") or {}).get("page") or ""
+        if image:
+            return image, page_url, "Wikipedia article image"
+    except (requests.RequestException, ValueError) as exc:
+        print("WIKIPEDIA PHOTO SEARCH ERROR:", name, exc)
+    return None
+
+
+def _get_or_download_place_photo(name, destination):
+    """Persistent local photo cache; retry misses after a short interval."""
+    key = _photo_normalize(name) + "|" + _photo_normalize(destination)
+    index = _photo_index_read()
+    entry = index.get(key) or {}
+    now = time.time()
+    local_url = entry.get("local_url", "")
+    if local_url:
+        file_path = PROJECT_ROOT / local_url.lstrip("/")
+        if file_path.exists() and now - entry.get("saved_at", 0) < PHOTO_CACHE_TTL:
+            return local_url, entry.get("description", ""), entry.get("source_page", "")
+
+    if not local_url and now - entry.get("checked_at", 0) < PHOTO_MISS_TTL:
+        return "", "", ""
+
+    # Search exact Wikipedia article first, then several Commons queries.
+    candidates = []
+    wiki = _wikipedia_candidate(name)
+    if wiki:
+        candidates.append((110, wiki[0], wiki[1], wiki[2]))
+
+    candidates.extend(_commons_candidates(name, destination))
+    downloaded = ""
+    source_page = ""
+    license_name = ""
+    for _, image_url, page_url, license_text in sorted(candidates, key=lambda x: x[0], reverse=True):
+        downloaded = _download_photo(image_url, name, page_url, license_text)
+        if downloaded:
+            source_page, license_name = page_url, license_text
+            break
+
+    entry = {
+        "local_url": downloaded,
+        "source_page": source_page,
+        "license": license_name,
+        "checked_at": now,
+        "saved_at": now if downloaded else 0,
+    }
+    _photo_index_write_entry(key, entry)
+    return downloaded, "", source_page
+
+
+def _add_real_photos(places, destination):
+    """Download and locally cache photographs for all visible attraction cards."""
+    targets = places[:40]
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        jobs = {
+            pool.submit(_get_or_download_place_photo, item["name"], destination): item
+            for item in targets if not item.get("image")
+        }
+        for future in as_completed(jobs):
+            item = jobs[future]
+            try:
+                image, description, article_url = future.result()
+                if image:
+                    item["image"] = image
+                    item["image_source"] = "Locally cached Wikimedia / Wikipedia photo"
+                    item["image_attribution_url"] = article_url
+                if description and len(item.get("description", "")) < 40:
+                    item["description"] = description
+                if article_url:
+                    item["wikipedia_url"] = article_url
+            except Exception as exc:
+                print("PHOTO ENRICHMENT ERROR:", item.get("name"), exc)
+    return places
+
+
+def search_places(destination):
+    destination = _clean(destination)
+    if not destination:
+        raise ValueError("Please provide a destination.")
+    key = "attractions:" + destination.casefold()
+    cached = _cache_get(key)
+    if cached is not None:
+        # Retry only cards missing a local photograph. The persistent photo
+        # index suppresses repeated failures for 15 minutes and retains files.
+        cached_places = cached.get("places", [])
+        if any(not item.get("image") for item in cached_places[:40]):
+            _add_real_photos(cached_places, destination)
+            _cache_set(key, cached)
+        return cached
+
+    location = geocode_india(destination)
+    if not location:
+        return {"destination": destination, "places": [], "source": "Geoapify"}
+
+    features = _geoapify_places(
+        location,
+        "tourism.attraction,tourism.sights,entertainment,heritage,leisure.park,natural,natural.water,natural.mountain",
+        limit=50,
+        radius=20000,
+    )
+    places, seen = [], set()
+    for feature in features:
+        item = _normalize_feature(feature, destination)
+        if not item:
+            continue
+        dedupe = item["name"].casefold()
+        if dedupe in seen:
+            continue
+        seen.add(dedupe)
+        places.append(item)
+        _DETAIL_CACHE[item["id"]] = item
+
+    places = _add_real_photos(places, destination)
+    places.sort(key=lambda p: (
+        0 if p.get("place_type") == "Famous Place" else 1,
+        p["distance_km"] is None,
+        p["distance_km"] if p["distance_km"] is not None else 9999,
+        p["name"].casefold(),
+    ))
+    result = {
+        "destination": destination,
+        "places": places[:40],
+        "source": "Geoapify Places / OpenStreetMap",
+        "location": location,
+    }
+    _cache_set(key, result)
+    return result
+
+
+def get_place_details(place_id):
+    if place_id in _DETAIL_CACHE:
+        return _DETAIL_CACHE[place_id]
+    if str(place_id).startswith("geoapify:"):
+        raise LookupError("This place is no longer in the current search. Search again.")
+    raise ValueError("Invalid place identifier.")
+
+
+def search_nearby(destination):
+    destination = _clean(destination)
+    if not destination:
+        raise ValueError("Destination is required.")
+    key = "nearby:" + destination.casefold()
+    cached = _cache_get(key)
+    if cached is not None:
+        return cached
+
+    location = geocode_india(destination)
+    if not location:
+        return {
+            "hotels": [], "restaurants": [],
+            "notice": "The destination could not be located in India.",
+            "source": "Geoapify",
+        }
+
+    hotels_raw = _geoapify_places(
+        location, "accommodation.hotel,accommodation.guest_house,accommodation.hostel",
+        limit=30, radius=10000,
+    )
+    restaurants_raw = _geoapify_places(
+        location, "catering.restaurant,catering.cafe,catering.fast_food",
+        limit=30, radius=8000,
+    )
+
+    def normalize(items, kind):
+        output, seen = [], set()
+        for feature in items:
+            item = _normalize_feature(feature, destination)
+            if not item or item["name"].casefold() in seen:
+                continue
+            seen.add(item["name"].casefold())
+            props = feature.get("properties") or {}
+            raw = (props.get("datasource") or {}).get("raw") or {}
+            item["phone"] = raw.get("phone") or raw.get("contact:phone") or ""
+            item["website"] = props.get("website") or raw.get("website") or raw.get("contact:website") or ""
+            item["category"] = kind
+            output.append(item)
+        output.sort(key=lambda x: x["distance_km"] if x["distance_km"] is not None else 9999)
+        return output
+
+    hotels = normalize(hotels_raw, "Accommodation")
+    restaurants = normalize(restaurants_raw, "Restaurant")
+    result = {
+        "hotels": hotels[:20],
+        "restaurants": restaurants[:20],
+        "notice": "" if hotels or restaurants else "No live nearby listings were returned. Try a larger nearby city.",
+        "source": "Geoapify Places / OpenStreetMap",
+    }
+    _cache_set(key, result)
+    return result

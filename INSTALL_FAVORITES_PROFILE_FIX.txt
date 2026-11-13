@@ -1,0 +1,16 @@
+Install into your EXISTING project root:
+1. Stop Flask (Ctrl+C).
+2. cd ~/Desktop/AI_Travel_Tourism
+3. Back up the four files:
+   cp static/js/favorites.js static/js/favorites.js.backup
+   cp static/js/profile.js static/js/profile.js.backup
+   cp static/css/favorites.css static/css/favorites.css.backup
+   cp templates/profile.html templates/profile.html.backup
+4. Extract this ZIP directly into that project folder:
+   unzip -o ~/Downloads/AI_Travel_Tourism_Favorites_Profile_Refinement.zip -d ~/Desktop/AI_Travel_Tourism
+5. Restart Flask and press Ctrl+Shift+R.
+
+Favorites now has consistent photo-led cards and aligned professional actions.
+Profile groups saved places by destination. Each group keeps its own places together.
+Removing a place removes only that one entry. Adding from Favorites stores the current
+trip destination with the place so it can be grouped correctly.

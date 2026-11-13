@@ -1,0 +1,1427 @@
+/* =========================================================
+   AI TRAVEL & TOURISM
+   GLOBAL DARK MODE
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   MAIN PAGE
+   --------------------------------------------------------- */
+
+body.dark-theme,
+body[data-theme="dark"] {
+    background: #0b1220 !important;
+    color: #f8fafc !important;
+}
+
+
+/* ---------------------------------------------------------
+   NAVBAR
+   --------------------------------------------------------- */
+
+body.dark-theme .navbar,
+body[data-theme="dark"] .navbar,
+body.dark-theme header,
+body[data-theme="dark"] header {
+    background: #111827 !important;
+    color: #f8fafc !important;
+    border-color: #273449 !important;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.35) !important;
+}
+
+body.dark-theme .navbar *,
+body[data-theme="dark"] .navbar *,
+body.dark-theme header *,
+body[data-theme="dark"] header * {
+    color: inherit;
+}
+
+body.dark-theme .nav-links a,
+body[data-theme="dark"] .nav-links a {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .nav-links a:hover,
+body[data-theme="dark"] .nav-links a:hover {
+    color: #60a5fa !important;
+}
+
+body.dark-theme .logo,
+body[data-theme="dark"] .logo {
+    color: #f8fafc !important;
+}
+
+
+/* ---------------------------------------------------------
+   PLANNING PAGE
+   --------------------------------------------------------- */
+
+body.dark-theme .planning-page,
+body[data-theme="dark"] .planning-page {
+    background: #0b1220 !important;
+    color: #f8fafc !important;
+}
+
+body.dark-theme .planning-wrapper,
+body[data-theme="dark"] .planning-wrapper {
+    background: transparent !important;
+    color: #f8fafc !important;
+}
+
+
+/* ---------------------------------------------------------
+   MAIN PLANNING HEADER
+   --------------------------------------------------------- */
+
+body.dark-theme .planning-header,
+body[data-theme="dark"] .planning-header {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .planning-header h1,
+body[data-theme="dark"] .planning-header h1 {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .planning-header p,
+body[data-theme="dark"] .planning-header p {
+    color: #cbd5e1 !important;
+}
+
+
+/* ---------------------------------------------------------
+   BACK BUTTON
+   --------------------------------------------------------- */
+
+body.dark-theme .back-button,
+body[data-theme="dark"] .back-button {
+    color: #e2e8f0 !important;
+    background: #111827 !important;
+    border-color: #334155 !important;
+}
+
+body.dark-theme .back-button:hover,
+body[data-theme="dark"] .back-button:hover {
+    color: #ffffff !important;
+    background: #1e293b !important;
+    border-color: #60a5fa !important;
+}
+
+
+/* ---------------------------------------------------------
+   TABS
+   --------------------------------------------------------- */
+
+body.dark-theme .planning-tabs,
+body[data-theme="dark"] .planning-tabs {
+    background: #111827 !important;
+    border-color: #273449 !important;
+}
+
+body.dark-theme .planning-tab,
+body[data-theme="dark"] .planning-tab {
+    color: #cbd5e1 !important;
+    background: transparent !important;
+    border-color: transparent !important;
+}
+
+body.dark-theme .planning-tab:hover,
+body[data-theme="dark"] .planning-tab:hover {
+    color: #ffffff !important;
+    background: #1e293b !important;
+}
+
+body.dark-theme .planning-tab.active,
+body[data-theme="dark"] .planning-tab.active {
+    color: #ffffff !important;
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+}
+
+
+/* ---------------------------------------------------------
+   TAB SECTIONS
+   --------------------------------------------------------- */
+
+body.dark-theme .tab-section,
+body[data-theme="dark"] .tab-section {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .tab-section h2,
+body[data-theme="dark"] .tab-section h2 {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .tab-section h3,
+body[data-theme="dark"] .tab-section h3 {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .tab-section p,
+body[data-theme="dark"] .tab-section p {
+    color: #cbd5e1 !important;
+}
+
+
+/* ---------------------------------------------------------
+   SUMMARY CONTAINER
+   --------------------------------------------------------- */
+
+body.dark-theme .summary-container,
+body[data-theme="dark"] .summary-container {
+    background: #111827 !important;
+    border-color: #273449 !important;
+    color: #f8fafc !important;
+}
+
+
+/* ---------------------------------------------------------
+   SUMMARY CARDS
+   --------------------------------------------------------- */
+
+body.dark-theme .summary-item,
+body[data-theme="dark"] .summary-item {
+    background: #172033 !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+}
+
+body.dark-theme .summary-item:hover,
+body[data-theme="dark"] .summary-item:hover {
+    background: #1e293b !important;
+    border-color: #475569 !important;
+}
+
+body.dark-theme .summary-item h3,
+body[data-theme="dark"] .summary-item h3 {
+    color: #94a3b8 !important;
+}
+
+body.dark-theme .summary-item strong,
+body[data-theme="dark"] .summary-item strong,
+body.dark-theme .summary-item span,
+body[data-theme="dark"] .summary-item span {
+    color: #f8fafc !important;
+}
+
+
+/* ---------------------------------------------------------
+   PLACES SECTION
+   --------------------------------------------------------- */
+
+body.dark-theme .places-section,
+body[data-theme="dark"] .places-section {
+    background: #111827 !important;
+    border-color: #273449 !important;
+    color: #f8fafc !important;
+}
+
+body.dark-theme .places-section h2,
+body[data-theme="dark"] .places-section h2 {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .places-section p,
+body[data-theme="dark"] .places-section p {
+    color: #cbd5e1 !important;
+}
+
+
+/* ---------------------------------------------------------
+   PLACE CARDS
+   --------------------------------------------------------- */
+
+body.dark-theme .place-card,
+body[data-theme="dark"] .place-card {
+    background: #172033 !important;
+    border: 1px solid #334155 !important;
+    color: #f8fafc !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.30) !important;
+}
+
+body.dark-theme .place-card:hover,
+body[data-theme="dark"] .place-card:hover {
+    background: #1e293b !important;
+    border-color: #475569 !important;
+}
+
+body.dark-theme .place-top,
+body[data-theme="dark"] .place-top {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+}
+
+body.dark-theme .place-content,
+body[data-theme="dark"] .place-content {
+    background: #172033 !important;
+    color: #f8fafc !important;
+}
+
+body.dark-theme .place-content h3,
+body[data-theme="dark"] .place-content h3 {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .place-content p,
+body[data-theme="dark"] .place-content p {
+    color: #cbd5e1 !important;
+}
+
+
+/* ---------------------------------------------------------
+   FAVORITE BUTTON
+   --------------------------------------------------------- */
+
+body.dark-theme .favorite-button,
+body[data-theme="dark"] .favorite-button {
+    background: #111827 !important;
+    color: #cbd5e1 !important;
+    border: 1px solid #475569 !important;
+}
+
+body.dark-theme .favorite-button:hover,
+body[data-theme="dark"] .favorite-button:hover {
+    background: #1e293b !important;
+    color: #ff4d67 !important;
+    border-color: #ff4d67 !important;
+}
+
+body.dark-theme .favorite-button.active,
+body[data-theme="dark"] .favorite-button.active {
+    color: #ff4d67 !important;
+    border-color: #ff4d67 !important;
+    background: rgba(255, 77, 103, 0.10) !important;
+}
+
+
+/* ---------------------------------------------------------
+   WEATHER
+   --------------------------------------------------------- */
+
+body.dark-theme .weather-section,
+body[data-theme="dark"] .weather-section {
+    background: #111827 !important;
+    border-color: #273449 !important;
+    color: #f8fafc !important;
+}
+
+body.dark-theme .weather-card,
+body[data-theme="dark"] .weather-card {
+    background: #172033 !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28) !important;
+}
+
+body.dark-theme .weather-card h3,
+body[data-theme="dark"] .weather-card h3 {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .weather-card p,
+body[data-theme="dark"] .weather-card p {
+    color: #cbd5e1 !important;
+}
+
+body.dark-theme .temperature,
+body[data-theme="dark"] .temperature {
+    color: #60a5fa !important;
+}
+
+
+/* ---------------------------------------------------------
+   ROUTES
+   --------------------------------------------------------- */
+
+body.dark-theme .routes-section,
+body[data-theme="dark"] .routes-section {
+    background: #111827 !important;
+    border-color: #273449 !important;
+    color: #f8fafc !important;
+}
+
+body.dark-theme .route-card,
+body[data-theme="dark"] .route-card {
+    background: #172033 !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28) !important;
+}
+
+body.dark-theme .route-card h3,
+body[data-theme="dark"] .route-card h3 {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .route-path,
+body[data-theme="dark"] .route-path {
+    color: #e2e8f0 !important;
+}
+
+body.dark-theme .route-detail,
+body[data-theme="dark"] .route-detail {
+    color: #cbd5e1 !important;
+}
+
+body.dark-theme .route-type,
+body[data-theme="dark"] .route-type {
+    color: #ffffff !important;
+    background: #1e3a8a !important;
+}
+
+
+/* ---------------------------------------------------------
+   BUTTONS
+   --------------------------------------------------------- */
+
+body.dark-theme button,
+body[data-theme="dark"] button {
+    color: #f8fafc;
+}
+
+body.dark-theme .select-route,
+body[data-theme="dark"] .select-route {
+    color: #ffffff !important;
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+}
+
+body.dark-theme .select-route:hover,
+body[data-theme="dark"] .select-route:hover {
+    background: #1d4ed8 !important;
+}
+
+body.dark-theme .modify-trip,
+body[data-theme="dark"] .modify-trip {
+    color: #e2e8f0 !important;
+    background: #111827 !important;
+    border-color: #475569 !important;
+}
+
+body.dark-theme .modify-trip:hover,
+body[data-theme="dark"] .modify-trip:hover {
+    background: #1e293b !important;
+    color: #ffffff !important;
+}
+
+
+/* ---------------------------------------------------------
+   INPUTS / SELECTS / TEXTAREAS
+   --------------------------------------------------------- */
+
+body.dark-theme input,
+body.dark-theme select,
+body.dark-theme textarea,
+body[data-theme="dark"] input,
+body[data-theme="dark"] select,
+body[data-theme="dark"] textarea {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #475569 !important;
+}
+
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder,
+body[data-theme="dark"] input::placeholder,
+body[data-theme="dark"] textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+body.dark-theme input:focus,
+body.dark-theme select:focus,
+body.dark-theme textarea:focus,
+body[data-theme="dark"] input:focus,
+body[data-theme="dark"] select:focus,
+body[data-theme="dark"] textarea:focus {
+    border-color: #60a5fa !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15) !important;
+}
+
+
+/* ---------------------------------------------------------
+   FOOTER
+   --------------------------------------------------------- */
+
+body.dark-theme footer,
+body[data-theme="dark"] footer {
+    background: #111827 !important;
+    color: #cbd5e1 !important;
+    border-top: 1px solid #273449 !important;
+}
+
+body.dark-theme footer *,
+body[data-theme="dark"] footer * {
+    color: #cbd5e1 !important;
+}
+
+body.dark-theme footer a:hover,
+body[data-theme="dark"] footer a:hover {
+    color: #60a5fa !important;
+}
+
+
+/* ---------------------------------------------------------
+   COMMON TEXT FIX
+   --------------------------------------------------------- */
+
+body.dark-theme .text-muted,
+body[data-theme="dark"] .text-muted,
+body.dark-theme .muted,
+body[data-theme="dark"] .muted {
+    color: #94a3b8 !important;
+}
+
+body.dark-theme small,
+body[data-theme="dark"] small {
+    color: #94a3b8 !important;
+}
+
+
+/* ---------------------------------------------------------
+   LINKS
+   --------------------------------------------------------- */
+
+body.dark-theme a,
+body[data-theme="dark"] a {
+    color: #60a5fa;
+}
+
+body.dark-theme a:hover,
+body[data-theme="dark"] a:hover {
+    color: #93c5fd;
+}
+
+
+/* ---------------------------------------------------------
+   SCROLLBAR
+   --------------------------------------------------------- */
+
+body.dark-theme::-webkit-scrollbar,
+body[data-theme="dark"]::-webkit-scrollbar {
+    width: 10px;
+}
+
+body.dark-theme::-webkit-scrollbar-track,
+body[data-theme="dark"]::-webkit-scrollbar-track {
+    background: #0b1220;
+}
+
+body.dark-theme::-webkit-scrollbar-thumb,
+body[data-theme="dark"]::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 10px;
+}
+
+body.dark-theme::-webkit-scrollbar-thumb:hover,
+body[data-theme="dark"]::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+   --------------------------------------------------------- */
+
+@media (max-width: 768px) {
+
+    body.dark-theme .planning-tabs,
+    body[data-theme="dark"] .planning-tabs {
+        background: #111827 !important;
+    }
+
+    body.dark-theme .planning-tab,
+    body[data-theme="dark"] .planning-tab {
+        color: #cbd5e1 !important;
+    }
+
+    body.dark-theme .planning-tab.active,
+    body[data-theme="dark"] .planning-tab.active {
+        color: #ffffff !important;
+    }
+}
+
+
+/* =========================================================
+   HOME PAGE — DARK MODE
+   ========================================================= */
+
+body.dark-theme,
+body[data-theme="dark"] {
+    background-color: #0b1220 !important;
+    color: #f8fafc;
+}
+
+/* Home page backgrounds */
+
+body.dark-theme main,
+body[data-theme="dark"] main,
+body.dark-theme .home-page,
+body[data-theme="dark"] .home-page,
+body.dark-theme .hero-section,
+body[data-theme="dark"] .hero-section {
+    background-color: #0b1220 !important;
+    color: #f8fafc !important;
+}
+
+
+
+
+/* AI Travel Assistant card */
+
+body.dark-theme .assistant-card,
+body[data-theme="dark"] .assistant-card,
+body.dark-theme .chatbot-card,
+body[data-theme="dark"] .chatbot-card,
+body.dark-theme .ai-assistant-card,
+body[data-theme="dark"] .ai-assistant-card {
+    background-color: #111827 !important;
+    color: #f8fafc !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Card headings */
+
+body.dark-theme .assistant-card h1,
+body.dark-theme .assistant-card h2,
+body.dark-theme .assistant-card h3,
+body.dark-theme .chatbot-card h1,
+body.dark-theme .chatbot-card h2,
+body.dark-theme .chatbot-card h3,
+body[data-theme="dark"] .assistant-card h1,
+body[data-theme="dark"] .assistant-card h2,
+body[data-theme="dark"] .assistant-card h3,
+body[data-theme="dark"] .chatbot-card h1,
+body[data-theme="dark"] .chatbot-card h2,
+body[data-theme="dark"] .chatbot-card h3 {
+    color: #f8fafc !important;
+}
+
+/* Chat input area */
+
+body.dark-theme .chat-input,
+body[data-theme="dark"] .chat-input,
+body.dark-theme .chat-input-container,
+body[data-theme="dark"] .chat-input-container,
+body.dark-theme .message-input,
+body[data-theme="dark"] .message-input {
+    background-color: #172033 !important;
+    color: #f8fafc !important;
+    border-color: #475569 !important;
+}
+
+/* Input placeholders */
+
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder,
+body[data-theme="dark"] input::placeholder,
+body[data-theme="dark"] textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* Chat messages */
+
+body.dark-theme .chat-message,
+body[data-theme="dark"] .chat-message,
+body.dark-theme .message,
+body[data-theme="dark"] .message {
+    color: #f8fafc;
+}
+
+/* User messages */
+
+body.dark-theme .user-message,
+body[data-theme="dark"] .user-message {
+    background-color: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+/* Assistant messages */
+
+body.dark-theme .assistant-message,
+body[data-theme="dark"] .assistant-message {
+    background-color: #172033 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* Chat buttons */
+
+body.dark-theme .send-button,
+body[data-theme="dark"] .send-button,
+body.dark-theme .chat-send-button,
+body[data-theme="dark"] .chat-send-button {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+}
+
+/* General Home page cards */
+
+body.dark-theme .card,
+body[data-theme="dark"] .card {
+    background-color: #172033 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* Footer */
+
+body.dark-theme footer,
+body[data-theme="dark"] footer {
+    background-color: #111827 !important;
+    color: #cbd5e1 !important;
+    border-top: 1px solid #273449 !important;
+}
+
+body.dark-theme footer p,
+body[data-theme="dark"] footer p {
+    color: #cbd5e1 !important;
+}
+
+
+/* =========================================================
+   HOME PAGE — PRECISE DARK MODE FIX
+   Uses the actual classes from templates/home.html
+   ========================================================= */
+
+/* 1. Home page background */
+
+body.dark-theme .hero,
+body.dark-theme .features-section,
+body[data-theme="dark"] .hero,
+body[data-theme="dark"] .features-section {
+    background-color: #0b1220 !important;
+    color: #f8fafc !important;
+}
+
+
+/* 2. Hero content and description */
+
+body.dark-theme .hero-content,
+body[data-theme="dark"] .hero-content {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .hero-content h1,
+body[data-theme="dark"] .hero-content h1 {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .hero-description,
+body[data-theme="dark"] .hero-description {
+    color: #cbd5e1 !important;
+}
+
+
+/* 3. AI Travel Assistant card */
+
+body.dark-theme .chat-card,
+body[data-theme="dark"] .chat-card {
+    background-color: #111827 !important;
+    color: #f8fafc !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+
+/* 4. Chat header */
+
+body.dark-theme .chat-header,
+body[data-theme="dark"] .chat-header {
+    background-color: #111827 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+body.dark-theme .assistant-info h2,
+body[data-theme="dark"] .assistant-info h2 {
+    color: #f8fafc !important;
+}
+
+
+/* 5. Initial chatbot message */
+
+body.dark-theme .chat-message,
+body[data-theme="dark"] .chat-message {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+body.dark-theme .chat-message p,
+body[data-theme="dark"] .chat-message p {
+    color: #cbd5e1 !important;
+}
+
+body.dark-theme .chat-message div,
+body[data-theme="dark"] .chat-message div {
+    color: #f8fafc !important;
+}
+
+
+/* 6. Destination input area */
+
+body.dark-theme .chat-input-area,
+body[data-theme="dark"] .chat-input-area {
+    background-color: #111827 !important;
+    border-color: #334155 !important;
+}
+
+body.dark-theme #destinationInput,
+body[data-theme="dark"] #destinationInput {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    border: 1px solid #475569 !important;
+}
+
+body.dark-theme #destinationInput::placeholder,
+body[data-theme="dark"] #destinationInput::placeholder {
+    color: #a8b6ca !important;
+    opacity: 1;
+}
+
+body.dark-theme #destinationInput:focus,
+body[data-theme="dark"] #destinationInput:focus {
+    border-color: #60a5fa !important;
+    outline: 2px solid rgba(96, 165, 250, 0.2);
+}
+
+
+/* 7. Start Planning button */
+
+body.dark-theme #startChatButton,
+body[data-theme="dark"] #startChatButton {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+    border-color: transparent !important;
+}
+
+body.dark-theme #startChatButton:hover,
+body[data-theme="dark"] #startChatButton:hover {
+    filter: brightness(1.12);
+}
+
+
+/* 8. Chat input hint */
+
+body.dark-theme .input-hint,
+body[data-theme="dark"] .input-hint {
+    color: #a8b6ca !important;
+}
+
+
+/* 9. What We Offer heading */
+
+body.dark-theme .section-heading,
+body[data-theme="dark"] .section-heading {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .section-heading h2,
+body[data-theme="dark"] .section-heading h2 {
+    color: #f8fafc !important;
+}
+
+
+/* 10. Feature cards — fix white cards and invisible text */
+
+body.dark-theme .feature-card,
+body[data-theme="dark"] .feature-card {
+    background-color: #172033 !important;
+    color: #f8fafc !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+}
+
+body.dark-theme .feature-card:hover,
+body[data-theme="dark"] .feature-card:hover {
+    background-color: #1e293b !important;
+    border-color: #475569 !important;
+}
+
+body.dark-theme .feature-card h3,
+body[data-theme="dark"] .feature-card h3 {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .feature-card p,
+body[data-theme="dark"] .feature-card p {
+    color: #cbd5e1 !important;
+}
+
+body.dark-theme .feature-icon,
+body[data-theme="dark"] .feature-icon {
+    color: #f8fafc !important;
+}
+
+
+/* 11. Feature grid */
+
+body.dark-theme .feature-grid,
+body[data-theme="dark"] .feature-grid {
+    color: #f8fafc !important;
+}
+
+
+/* 12. Footer — keep it consistent */
+
+body.dark-theme .footer,
+body[data-theme="dark"] .footer {
+    background-color: #111827 !important;
+    color: #cbd5e1 !important;
+    border-top: 1px solid #273449 !important;
+}
+
+body.dark-theme .footer p,
+body[data-theme="dark"] .footer p {
+    color: #cbd5e1 !important;
+}
+
+
+/* 13. Prevent unwanted white text on white card elements */
+
+body.dark-theme .feature-card *,
+body[data-theme="dark"] .feature-card * {
+    border-color: #334155;
+}
+
+body.dark-theme .chat-card *,
+body[data-theme="dark"] .chat-card * {
+    border-color: inherit;
+}
+
+
+/* 14. Keep the theme consistent on smaller screens */
+
+@media (max-width: 768px) {
+    body.dark-theme .chat-card,
+    body[data-theme="dark"] .chat-card {
+        background-color: #111827 !important;
+        color: #f8fafc !important;
+    }
+
+    body.dark-theme .feature-card,
+    body[data-theme="dark"] .feature-card {
+        background-color: #172033 !important;
+        color: #f8fafc !important;
+    }
+}
+
+/* =====================================================
+   CHAT PAGE — DARK MODE ONLY
+   ===================================================== */
+
+/* Main chat page background */
+body.dark-theme,
+body[data-theme="dark"] {
+    background: #0b1220 !important;
+}
+
+/* Chat page container */
+body.dark-theme .chat-container,
+body[data-theme="dark"] .chat-container,
+body.dark-theme .chat-page,
+body[data-theme="dark"] .chat-page {
+    background: #0b1220 !important;
+    color: #f8fafc !important;
+}
+
+/* Main chatbot panel */
+body.dark-theme .chat-card,
+body[data-theme="dark"] .chat-card,
+body.dark-theme .chat-window,
+body[data-theme="dark"] .chat-window,
+body.dark-theme .chat-wrapper,
+body[data-theme="dark"] .chat-wrapper {
+    background: #111827 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* Chat header */
+body.dark-theme .chat-header,
+body[data-theme="dark"] .chat-header {
+    background: #111827 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* Header text */
+body.dark-theme .chat-header h1,
+body.dark-theme .chat-header h2,
+body.dark-theme .chat-header h3,
+body[data-theme="dark"] .chat-header h1,
+body[data-theme="dark"] .chat-header h2,
+body[data-theme="dark"] .chat-header h3 {
+    color: #f8fafc !important;
+}
+
+/* Chat messages area */
+body.dark-theme .chat-messages,
+body[data-theme="dark"] .chat-messages,
+body.dark-theme .messages-container,
+body[data-theme="dark"] .messages-container {
+    background: #111827 !important;
+    color: #f8fafc !important;
+}
+
+/* Individual messages */
+body.dark-theme .chat-message,
+body[data-theme="dark"] .chat-message {
+    color: #f8fafc !important;
+}
+
+/* Assistant messages */
+body.dark-theme .assistant-message,
+body[data-theme="dark"] .assistant-message,
+body.dark-theme .bot-message,
+body[data-theme="dark"] .bot-message {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* User messages */
+body.dark-theme .user-message,
+body[data-theme="dark"] .user-message {
+    background: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+/* Text inside messages */
+body.dark-theme .chat-message p,
+body.dark-theme .chat-message span,
+body.dark-theme .assistant-message p,
+body.dark-theme .assistant-message span,
+body.dark-theme .bot-message p,
+body.dark-theme .bot-message span,
+body[data-theme="dark"] .chat-message p,
+body[data-theme="dark"] .chat-message span,
+body[data-theme="dark"] .assistant-message p,
+body[data-theme="dark"] .assistant-message span,
+body[data-theme="dark"] .bot-message p,
+body[data-theme="dark"] .bot-message span {
+    color: inherit !important;
+}
+
+/* Chat input area */
+body.dark-theme .chat-input-area,
+body[data-theme="dark"] .chat-input-area,
+body.dark-theme .chat-input-container,
+body[data-theme="dark"] .chat-input-container {
+    background: #111827 !important;
+    border-color: #334155 !important;
+}
+
+/* Input field */
+body.dark-theme #messageInput,
+body[data-theme="dark"] #messageInput,
+body.dark-theme #chatInput,
+body[data-theme="dark"] #chatInput,
+body.dark-theme .chat-input,
+body[data-theme="dark"] .chat-input {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border: 1px solid #475569 !important;
+}
+
+/* Input placeholder */
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder,
+body[data-theme="dark"] input::placeholder,
+body[data-theme="dark"] textarea::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1;
+}
+
+/* Send button */
+body.dark-theme .send-button,
+body[data-theme="dark"] .send-button,
+body.dark-theme #sendButton,
+body[data-theme="dark"] #sendButton {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #2563eb !important;
+}
+
+/* Back button */
+body.dark-theme .back-button,
+body[data-theme="dark"] .back-button {
+    background: #111827 !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+/* Footer */
+body.dark-theme .footer,
+body[data-theme="dark"] .footer {
+    background: #111827 !important;
+    color: #cbd5e1 !important;
+    border-color: #334155 !important;
+}
+
+body.dark-theme .footer p,
+body[data-theme="dark"] .footer p {
+    color: #cbd5e1 !important;
+}
+
+
+/* =====================================================
+   CHAT PAGE — DARK MODE ONLY
+   ===================================================== */
+
+/* Main chat page background */
+body.dark-theme,
+body[data-theme="dark"] {
+    background: #0b1220 !important;
+}
+
+/* Chat page container */
+body.dark-theme .chat-container,
+body[data-theme="dark"] .chat-container,
+body.dark-theme .chat-page,
+body[data-theme="dark"] .chat-page {
+    background: #0b1220 !important;
+    color: #f8fafc !important;
+}
+
+/* Main chatbot panel */
+body.dark-theme .chat-card,
+body[data-theme="dark"] .chat-card,
+body.dark-theme .chat-window,
+body[data-theme="dark"] .chat-window,
+body.dark-theme .chat-wrapper,
+body[data-theme="dark"] .chat-wrapper {
+    background: #111827 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* Chat header */
+body.dark-theme .chat-header,
+body[data-theme="dark"] .chat-header {
+    background: #111827 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* Header text */
+body.dark-theme .chat-header h1,
+body.dark-theme .chat-header h2,
+body.dark-theme .chat-header h3,
+body[data-theme="dark"] .chat-header h1,
+body[data-theme="dark"] .chat-header h2,
+body[data-theme="dark"] .chat-header h3 {
+    color: #f8fafc !important;
+}
+
+/* Chat messages area */
+body.dark-theme .chat-messages,
+body[data-theme="dark"] .chat-messages,
+body.dark-theme .messages-container,
+body[data-theme="dark"] .messages-container {
+    background: #111827 !important;
+    color: #f8fafc !important;
+}
+
+/* Individual messages */
+body.dark-theme .chat-message,
+body[data-theme="dark"] .chat-message {
+    color: #f8fafc !important;
+}
+
+/* Assistant messages */
+body.dark-theme .assistant-message,
+body[data-theme="dark"] .assistant-message,
+body.dark-theme .bot-message,
+body[data-theme="dark"] .bot-message {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* User messages */
+body.dark-theme .user-message,
+body[data-theme="dark"] .user-message {
+    background: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
+/* Text inside messages */
+body.dark-theme .chat-message p,
+body.dark-theme .chat-message span,
+body.dark-theme .assistant-message p,
+body.dark-theme .assistant-message span,
+body.dark-theme .bot-message p,
+body.dark-theme .bot-message span,
+body[data-theme="dark"] .chat-message p,
+body[data-theme="dark"] .chat-message span,
+body[data-theme="dark"] .assistant-message p,
+body[data-theme="dark"] .assistant-message span,
+body[data-theme="dark"] .bot-message p,
+body[data-theme="dark"] .bot-message span {
+    color: inherit !important;
+}
+
+/* Chat input area */
+body.dark-theme .chat-input-area,
+body[data-theme="dark"] .chat-input-area,
+body.dark-theme .chat-input-container,
+body[data-theme="dark"] .chat-input-container {
+    background: #111827 !important;
+    border-color: #334155 !important;
+}
+
+/* Input field */
+body.dark-theme #messageInput,
+body[data-theme="dark"] #messageInput,
+body.dark-theme #chatInput,
+body[data-theme="dark"] #chatInput,
+body.dark-theme .chat-input,
+body[data-theme="dark"] .chat-input {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border: 1px solid #475569 !important;
+}
+
+/* Input placeholder */
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder,
+body[data-theme="dark"] input::placeholder,
+body[data-theme="dark"] textarea::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1;
+}
+
+/* Send button */
+body.dark-theme .send-button,
+body[data-theme="dark"] .send-button,
+body.dark-theme #sendButton,
+body[data-theme="dark"] #sendButton {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #2563eb !important;
+}
+
+/* Back button */
+body.dark-theme .back-button,
+body[data-theme="dark"] .back-button {
+    background: #111827 !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+/* Footer */
+body.dark-theme .footer,
+body[data-theme="dark"] .footer {
+    background: #111827 !important;
+    color: #cbd5e1 !important;
+    border-color: #334155 !important;
+}
+
+body.dark-theme .footer p,
+body[data-theme="dark"] .footer p {
+    color: #cbd5e1 !important;
+}
+
+/* =========================================
+   PLANNING PAGE — THEME-CONSISTENT MESSAGES
+========================================= */
+
+/* Dark mode: support the theme selectors used by the project */
+body.dark-theme #placesGrid > div,
+body[data-theme="dark"] #placesGrid > div,
+body.dark-mode #placesGrid > div {
+    background-color: var(--surface, #111827) !important;
+    color: var(--text, #f8fafc) !important;
+    border-color: var(--border, #334155) !important;
+}
+
+/* Make text inside the message readable in dark mode */
+body.dark-theme #placesGrid > div h1,
+body.dark-theme #placesGrid > div h2,
+body.dark-theme #placesGrid > div h3,
+body.dark-theme #placesGrid > div p,
+body.dark-theme #placesGrid > div span,
+body[data-theme="dark"] #placesGrid > div h1,
+body[data-theme="dark"] #placesGrid > div h2,
+body[data-theme="dark"] #placesGrid > div h3,
+body[data-theme="dark"] #placesGrid > div p,
+body[data-theme="dark"] #placesGrid > div span,
+body.dark-mode #placesGrid > div h1,
+body.dark-mode #placesGrid > div h2,
+body.dark-mode #placesGrid > div h3,
+body.dark-mode #placesGrid > div p,
+body.dark-mode #placesGrid > div span {
+    color: var(--text, #f8fafc) !important;
+}
+
+/* Light mode: keep the message white with dark text */
+body:not(.dark-theme):not(.dark-mode):not([data-theme="dark"])
+#placesGrid > div {
+    background-color: #ffffff;
+    color: #172033;
+    border-color: #e2e8f0;
+}
+
+body:not(.dark-theme):not(.dark-mode):not([data-theme="dark"])
+#placesGrid > div h1,
+body:not(.dark-theme):not(.dark-mode):not([data-theme="dark"])
+#placesGrid > div h2,
+body:not(.dark-theme):not(.dark-mode):not([data-theme="dark"])
+#placesGrid > div h3,
+body:not(.dark-theme):not(.dark-mode):not([data-theme="dark"])
+#placesGrid > div p,
+body:not(.dark-theme):not(.dark-mode):not([data-theme="dark"])
+#placesGrid > div span {
+    color: #172033;
+}
+
+/* Keep buttons readable and usable */
+#placesGrid button {
+    cursor: pointer;
+    max-width: 100%;
+}
+
+@media (max-width: 600px) {
+    #placesGrid > div {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+}
+
+/* =========================================================
+   REAL TOURIST PLACE CARDS — DARK MODE FIX
+========================================================= */
+
+body.dark-theme .real-place-card,
+body[data-theme="dark"] .real-place-card,
+body.dark-mode .real-place-card {
+    background: #172033 !important;
+    color: #f8fafc !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-theme .real-place-card:hover,
+body[data-theme="dark"] .real-place-card:hover,
+body.dark-mode .real-place-card:hover {
+    background: #1e293b !important;
+    border-color: #475569 !important;
+}
+
+body.dark-theme .real-place-content,
+body[data-theme="dark"] .real-place-content,
+body.dark-mode .real-place-content {
+    background: #172033 !important;
+    color: #f8fafc !important;
+}
+
+body.dark-theme .real-place-content h3,
+body[data-theme="dark"] .real-place-content h3,
+body.dark-mode .real-place-content h3 {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .real-place-location,
+body[data-theme="dark"] .real-place-location,
+body.dark-mode .real-place-location,
+body.dark-theme .real-place-timing,
+body[data-theme="dark"] .real-place-timing,
+body.dark-mode .real-place-timing {
+    color: #cbd5e1 !important;
+}
+
+/* Favorite heart */
+body.dark-theme .real-place-card .place-heart-button,
+body[data-theme="dark"] .real-place-card .place-heart-button,
+body.dark-mode .real-place-card .place-heart-button {
+    background: #111827 !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #475569 !important;
+}
+
+body.dark-theme .real-place-card .place-heart-button.is-favorite,
+body[data-theme="dark"] .real-place-card .place-heart-button.is-favorite,
+body.dark-mode .real-place-card .place-heart-button.is-favorite {
+    color: #fb7185 !important;
+    background: rgba(251, 113, 133, 0.12) !important;
+    border-color: #fb7185 !important;
+}
+
+/* Add to Trip */
+body.dark-theme .real-place-card .place-add-button,
+body[data-theme="dark"] .real-place-card .place-add-button,
+body.dark-mode .real-place-card .place-add-button {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #2563eb !important;
+}
+
+body.dark-theme .real-place-card .place-add-button:hover,
+body[data-theme="dark"] .real-place-card .place-add-button:hover,
+body.dark-mode .real-place-card .place-add-button:hover {
+    background: #1d4ed8 !important;
+}
+
+/* See Details button */
+body.dark-theme .real-place-card .place-details-button,
+body[data-theme="dark"] .real-place-card .place-details-button,
+body.dark-mode .real-place-card .place-details-button {
+    background: #1e293b !important;
+    color: #93c5fd !important;
+    border: 1px solid #475569 !important;
+}
+
+body.dark-theme .real-place-card .place-details-button:hover,
+body[data-theme="dark"] .real-place-card .place-details-button:hover,
+body.dark-mode .real-place-card .place-details-button:hover {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
+/* Keep the detail popup dark, too */
+body.dark-theme .place-details-panel,
+body[data-theme="dark"] .place-details-panel,
+body.dark-mode .place-details-panel {
+    background: #111827 !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+body.dark-theme .place-details-content,
+body[data-theme="dark"] .place-details-content,
+body.dark-mode .place-details-content {
+    background: #111827 !important;
+    color: #f8fafc !important;
+}
+
+body.dark-theme .place-details-content h2,
+body[data-theme="dark"] .place-details-content h2,
+body.dark-mode .place-details-content h2,
+body.dark-theme .place-fact-section h3,
+body[data-theme="dark"] .place-fact-section h3,
+body.dark-mode .place-fact-section h3 {
+    color: #f8fafc !important;
+}
+
+body.dark-theme .place-details-content p,
+body[data-theme="dark"] .place-details-content p,
+body.dark-mode .place-details-content p {
+    color: #cbd5e1 !important;
+}
+
+body.dark-theme .place-fact-section,
+body[data-theme="dark"] .place-fact-section,
+body.dark-mode .place-fact-section {
+    background: #172033 !important;
+    border-color: #334155 !important;
+}
+
+body.dark-theme .place-source-note,
+body[data-theme="dark"] .place-source-note,
+body.dark-mode .place-source-note {
+    color: #94a3b8 !important;
+}

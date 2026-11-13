@@ -1,0 +1,36 @@
+AI TRAVEL TOURISM — ITINERARY DISPLAY REFINEMENT
+================================================
+This patch updates ONLY:
+  templates/itinerary.html
+  static/js/itinerary.js
+
+Changes:
+- Removes generic encyclopedia descriptions and day notes.
+- Shows selected attraction names as numbered stops with map links.
+- Filters destination names and generic "List of tourist attractions..." entries.
+- Displays hotel and restaurant listings as individual cards.
+- Shows four cards initially and a View more button when more are returned.
+- Does not alter app.py, route handling, database, favorites, profile, or planning pages.
+
+Install:
+1. Stop Flask (Ctrl+C).
+2. In terminal:
+   cd ~/Desktop/AI_Travel_Tourism
+   mkdir -p backup_itinerary_display_fix
+   cp templates/itinerary.html backup_itinerary_display_fix/
+   cp static/js/itinerary.js backup_itinerary_display_fix/
+3. Extract this ZIP into the EXISTING project folder, choosing "Extract here" or:
+   unzip -o ~/Downloads/AI_Travel_Tourism_ITINERARY_DISPLAY_FIX.zip -d .
+4. Restart:
+   source venv/bin/activate
+   python app.py
+5. Open /itinerary and press Ctrl+Shift+R.
+
+Note:
+- Hotel/restaurant cards appear only for named listings returned by the existing /api/nearby endpoint.
+- If the public OpenStreetMap provider returns no records, the page displays a Maps fallback instead of inventing businesses.
+- The patch does not add ratings, prices, photos, or live availability that the data source does not provide.
+
+Rollback:
+  cp backup_itinerary_display_fix/itinerary.html templates/itinerary.html
+  cp backup_itinerary_display_fix/itinerary.js static/js/itinerary.js

@@ -1,0 +1,22 @@
+AI Travel & Tourism - chatbot trip extraction fix
+
+Updated:
+- app/services/trip_parser.py
+
+What changed:
+- Parse each user message independently instead of joining all messages into one string.
+- Later explicit route corrections replace earlier origin/destination values.
+- Recognise common route forms such as:
+  "from Hyderabad to Mysore"
+  "Hyderabad to Mysore for 5 days"
+  "plan trip from Hyderabad to Araku for 3 days"
+- Extract days separately from budget.
+- Only extract budget when a currency marker, rupees/rs, or explicit budget wording is present,
+  or when the assistant's immediately preceding question asks for the budget.
+- Extract transport and traveller count without treating unrelated numbers as trip fields.
+
+Important:
+- This improves trip-field extraction. It does not guarantee that a misspelled place name
+  can be geocoded; spelling correction/geocoding is a separate place-search improvement.
+- Public map/place/weather services can still have outages, so no project can honestly promise
+  100% availability from free external services.

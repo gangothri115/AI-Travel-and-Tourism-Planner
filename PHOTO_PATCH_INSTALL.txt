@@ -1,0 +1,38 @@
+PHOTO RETRIEVAL PATCH
+=====================
+
+Files included:
+- app/services/place_service.py
+- static/js/places.js
+
+What this patch changes:
+- Moves all photo lookup to the Flask backend.
+- Searches Wikipedia by exact attraction title first.
+- Searches Wikimedia Commons only for title-matched image candidates.
+- Does NOT select the first arbitrary Commons result.
+- Validates remote image URLs by checking that the response is an image.
+- Caches successful photographs for 7 days.
+- Caches photo misses for only 10 minutes, so temporary provider failures
+  do not permanently poison the 24-hour attraction cache.
+- Rechecks missing photographs when cached attractions are requested.
+- Removes duplicate browser-side Commons searches.
+
+Installation:
+1. Stop Flask with Ctrl+C.
+2. Make a backup:
+   cp app/services/place_service.py app/services/place_service.py.before_photo_patch
+   cp static/js/places.js static/js/places.js.before_photo_patch
+3. Extract this ZIP into the OUTER project folder:
+   ~/Desktop/AI_Travel_Tourism
+   Allow replacement of the two matching files.
+4. Restart:
+   source venv/bin/activate
+   python app.py
+5. Hard refresh Chrome with Ctrl+Shift+R.
+
+Notes:
+- No photograph provider can guarantee an image for every lesser-known place.
+- The patch intentionally refuses unrelated images rather than showing a wrong
+  photograph. If a matching image is not available, the card keeps its thumbnail
+  placeholder and a later search can retry.
+- No .env or API keys are included.

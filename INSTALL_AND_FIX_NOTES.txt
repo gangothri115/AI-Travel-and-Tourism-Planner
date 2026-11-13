@@ -1,0 +1,57 @@
+AI TRAVEL & TOURISM — CONSOLIDATED FIXES
+=========================================
+
+Copy the folder contents into your existing project folder, preserving the
+relative paths and allowing replacement of matching files.
+
+Files included:
+- app/services/place_service.py
+- app/services/trip_parser.py
+- static/js/planning.js
+- static/js/places.js
+- static/js/favorites.js
+- static/js/profile.js
+- static/js/itinerary.js
+- static/css/places.css
+- templates/favorites.html
+- templates/itinerary.html
+
+What this patch fixes:
+1. Removes the duplicate places loader from planning.js. Previously planning.js
+   and places.js both fetched and rewrote #placesGrid, so cards could appear
+   and then disappear depending on which request finished last.
+2. Adds offline destination attraction lists for popular Indian destinations
+   and returns these when Nominatim/Overpass fail or return no attractions.
+3. Keeps browser-side attraction discovery cached and adds a final local
+   destination fallback when both remote browser providers fail.
+4. Rebuilds Favorites using the same real-place-card component classes and
+   loads the shared places stylesheet.
+5. Fixes Profile > Remove so it removes only one matching place. The previous
+   predicate could remove every item when IDs were missing.
+6. Lets Profile > Plan trip continue with automatic destination highlights
+   when no places were manually selected.
+7. Creates day-by-day schedules from selected or auto-suggested highlights,
+   with clickable Google Maps searches for lunch, dinner and accommodation.
+8. Fixes trip parsing so the most recent route/budget/day/traveller values
+   take priority and fixes an escaped regular expression in traveller parsing.
+
+INSTALL:
+1. Stop Flask with Ctrl+C.
+2. Back up the project folder.
+3. Extract this ZIP.
+4. Copy the AI_Travel_Tourism folder's contents into your existing
+   ~/Desktop/AI_Travel_Tourism folder, preserving paths and replacing files.
+5. Restart:
+   cd ~/Desktop/AI_Travel_Tourism
+   source venv/bin/activate
+   python app.py
+6. Hard-refresh the browser with Ctrl+Shift+R.
+
+IMPORTANT:
+- This ZIP contains only changed files, not a replacement complete project.
+- Keep your existing .env, database, venv and all other project files.
+- External live place providers can still be unavailable. The offline list is
+  a fallback for the destinations included in the code, not a guarantee of
+  live opening hours, prices or booking availability.
+- Restaurant and hotel links open live map searches; they are suggestions,
+  not reservations or verified availability.

@@ -1,0 +1,545 @@
+import re
+import time
+from copy import deepcopy
+import requests
+from urllib.parse import quote
+
+
+OVERPASS_URLS = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
+]
+
+HEADERS = {
+    "User-Agent": "AITravelTourismStudentProject/1.0 (Flask travel project)"
+}
+
+SESSION = requests.Session()
+SESSION.headers.update(HEADERS)
+
+
+def clean_text(value):
+    return re.sub(r"\s+", " ", str(value or "")).strip()
+
+
+def wikipedia_information(title):
+    if not title:
+        return {}
+
+    try:
+        url = (
+            "https://en.wikipedia.org/api/rest_v1/page/summary/"
+            + quote(title.replace(" ", "_"), safe="()_,.-")
+        )
+
+        response = SESSION.get(url, timeout=(2, 4))
+        response.raise_for_status()
+        data = response.json()
+
+        if data.get("type") == "disambiguation":
+            return {}
+
+        return {
+            "description": clean_text(data.get("extract")),
+            "image": (
+                (data.get("thumbnail") or {}).get("source")
+                or (data.get("originalimage") or {}).get("source")
+            ),
+            "wikipedia_url": (
+                (data.get("content_urls") or {})
+                .get("desktop", {})
+                .get("page")
+            ),
+        }
+
+    except (requests.RequestException, ValueError) as error:
+        print("WIKIPEDIA LOOKUP ERROR:", error)
+        return {}
+
+
+def get_overpass_data(query, timeout=30):
+    """Try several Overpass servers and report their actual errors."""
+
+    for endpoint in OVERPASS_URLS:
+        try:
+            print("Trying Overpass endpoint:", endpoint)
+
+            response = SESSION.post(
+                endpoint,
+                data={"data": query},
+                timeout=(1, 2)
+            )
+
+            response.raise_for_status()
+            return response.json()
+
+        except (requests.RequestException, ValueError) as error:
+            print(f"OVERPASS ERROR [{endpoint}]: {error}")
+
+    raise RuntimeError(
+        "All Overpass servers failed. Check the terminal for details."
+    )
+
+
+def find_destination(destination):
+    response = SESSION.get(
+        "https://nominatim.openstreetmap.org/search",
+        params={
+            "q": destination,
+            "format": "jsonv2",
+            "limit": 1,
+            "countrycodes": "in",
+        },
+        timeout=(1, 3)
+    )
+
+    response.raise_for_status()
+    locations = response.json()
+
+    if not locations:
+        return None
+
+    return locations[0]
+
+
+def _search_places_uncached(destination):
+    destination = clean_text(destination)
+
+    if not destination:
+        raise ValueError("Please provide a destination.")
+
+    location = find_destination(destination)
+
+    if not location:
+        return {
+            "destination": destination,
+            "places": [],
+            "source": "OpenStreetMap contributors",
+        }
+
+    latitude = float(location["lat"])
+    longitude = float(location["lon"])
+
+    query = f"""
+    [out:json][timeout:25];
+    (
+      nwr(around:12000,{latitude},{longitude})
+          ["tourism"~"attraction|museum|viewpoint|artwork|zoo|gallery"];
+      nwr(around:12000,{latitude},{longitude})["historic"];
+      nwr(around:12000,{latitude},{longitude})
+          ["amenity"="place_of_worship"];
+      nwr(around:12000,{latitude},{longitude})
+          ["leisure"~"park|nature_reserve|garden"];
+      nwr(around:12000,{latitude},{longitude})
+          ["natural"~"peak|waterfall|cave|beach"];
+    );
+    out center tags;
+    """
+
+    result = get_overpass_data(query)
+
+    places = []
+    seen_names = set()
+
+    for element in result.get("elements", []):
+        tags = element.get("tags") or {}
+
+        name = clean_text(tags.get("name") or tags.get("name:en"))
+
+        if not name or name.casefold() in seen_names:
+            continue
+
+        center = element.get("center") or {}
+
+        place_lat = element.get("lat", center.get("lat"))
+        place_lon = element.get("lon", center.get("lon"))
+
+        if place_lat is None or place_lon is None:
+            continue
+
+        seen_names.add(name.casefold())
+
+        category = (
+            tags.get("tourism")
+            or tags.get("historic")
+            or tags.get("amenity")
+            or tags.get("leisure")
+            or tags.get("natural")
+            or "Place"
+        ).replace("_", " ").title()
+
+        wikipedia_title = tags.get("wikipedia", "")
+
+        if wikipedia_title.lower().startswith("en:"):
+            wikipedia_title = wikipedia_title[3:]
+
+        # Use metadata already present in OpenStreetMap. Wikipedia is queried
+        # only on demand from the details panel, never serially for every card.
+        wiki = {}
+
+        places.append({
+            "id": f'{element["type"]}/{element["id"]}',
+            "name": name,
+            "category": category,
+            "latitude": float(place_lat),
+            "longitude": float(place_lon),
+            "image": tags.get("image") or wiki.get("image"),
+            "description": (
+                wiki.get("description")
+                or clean_text(tags.get("description"))
+            ),
+            "opening_hours": clean_text(tags.get("opening_hours")),
+            "website": tags.get("website") or tags.get("contact:website"),
+            "wikipedia_url": wiki.get("wikipedia_url"),
+            "map_url": (
+                "https://www.openstreetmap.org/"
+                f"?mlat={place_lat}&mlon={place_lon}"
+                f"#map=17/{place_lat}/{place_lon}"
+            ),
+            "source": "OpenStreetMap contributors",
+        })
+
+    # Show places with real image URLs first.
+    places.sort(
+        key=lambda place: (
+            not bool(place["image"]),
+            place["name"].casefold()
+        )
+    )
+
+    return {
+        "destination": destination,
+        "places": places[:30],
+        "source": "OpenStreetMap contributors",
+    }
+
+
+
+# Small offline catalogue for common Indian destinations. These are fallback
+# suggestions only; live OSM results take precedence whenever available.
+_OFFLINE_ATTRACTIONS = {
+    "hyderabad": [
+        ("Charminar", "Historic landmark"), ("Golconda Fort", "Historic fort"),
+        ("Salar Jung Museum", "Museum"), ("Chowmahalla Palace", "Palace"),
+        ("Hussain Sagar Lake", "Lake"), ("Qutb Shahi Tombs", "Historic site"),
+        ("Birla Mandir", "Temple"), ("Ramoji Film City", "Theme park"),
+    ],
+    "delhi": [
+        ("India Gate", "Monument"), ("Red Fort", "Historic fort"),
+        ("Qutub Minar", "UNESCO World Heritage Site"), ("Humayun's Tomb", "Historic site"),
+        ("Lotus Temple", "Temple"), ("Akshardham Temple", "Temple"),
+        ("Jama Masjid", "Mosque"), ("National Museum", "Museum"),
+    ],
+    "mysore": [
+        ("Mysore Palace", "Palace"), ("Chamundi Hill", "Hill and temple"),
+        ("Brindavan Gardens", "Garden"), ("St. Philomena's Church", "Church"),
+        ("Mysuru Zoo", "Zoo"), ("Jaganmohan Palace", "Museum"),
+    ],
+    "tirumala": [
+        ("Sri Venkateswara Temple", "Temple"), ("Akash Ganga", "Waterfall"),
+        ("Papavinasam", "Waterfall"), ("Silathoranam", "Natural arch"),
+        ("Srivari Padalu", "Viewpoint"),
+    ],
+    "araku": [
+        ("Borra Caves", "Cave"), ("Katiki Waterfalls", "Waterfall"),
+        ("Padmapuram Gardens", "Garden"), ("Tribal Museum", "Museum"),
+        ("Coffee Museum", "Museum"), ("Galikonda View Point", "Viewpoint"),
+    ],
+    "ooty": [
+        ("Government Botanical Garden", "Garden"), ("Ooty Lake", "Lake"),
+        ("Doddabetta Peak", "Viewpoint"), ("Government Rose Garden", "Garden"),
+        ("Nilgiri Mountain Railway", "Heritage railway"), ("Pykara Falls", "Waterfall"),
+    ],
+    "kadapa": [
+        ("Gandikota", "Historic fort and gorge"), ("Ameen Peer Dargah", "Religious site"),
+        ("Sri Venkateswara Wildlife Sanctuary", "Nature reserve"),
+        ("Devuni Kadapa", "Temple"), ("Pushpagiri Temple", "Temple"),
+    ],
+    "vijayawada": [
+        ("Kanaka Durga Temple", "Temple"), ("Undavalli Caves", "Cave"),
+        ("Prakasam Barrage", "Landmark"), ("Bhavani Island", "Island"),
+        ("Kondapalli Fort", "Historic fort"),
+    ],
+    "visakhapatnam": [
+        ("RK Beach", "Beach"), ("Kailasagiri", "Hill park"),
+        ("INS Kursura Submarine Museum", "Museum"), ("Borra Caves", "Cave"),
+        ("Simhachalam Temple", "Temple"), ("Dolphin's Nose", "Viewpoint"),
+    ],
+    "agra": [
+        ("Taj Mahal", "UNESCO World Heritage Site"), ("Agra Fort", "Historic fort"),
+        ("Mehtab Bagh", "Garden"), ("Itimad-ud-Daulah's Tomb", "Historic site"),
+        ("Fatehpur Sikri", "Historic city"),
+    ],
+    "jaipur": [
+        ("Amber Fort", "Historic fort"), ("Hawa Mahal", "Palace"),
+        ("City Palace", "Palace"), ("Jantar Mantar", "UNESCO World Heritage Site"),
+        ("Nahargarh Fort", "Historic fort"), ("Jal Mahal", "Palace"),
+    ],
+    "bengaluru": [
+        ("Lalbagh Botanical Garden", "Garden"), ("Bengaluru Palace", "Palace"),
+        ("Cubbon Park", "Park"), ("ISKCON Temple", "Temple"),
+        ("Bannerghatta Biological Park", "Nature park"),
+    ],
+    "chennai": [
+        ("Marina Beach", "Beach"), ("Kapaleeshwarar Temple", "Temple"),
+        ("Fort St. George", "Historic fort"), ("Government Museum", "Museum"),
+        ("Santhome Cathedral Basilica", "Church"),
+    ],
+    "mumbai": [
+        ("Gateway of India", "Monument"), ("Marine Drive", "Waterfront"),
+        ("Chhatrapati Shivaji Maharaj Terminus", "Historic railway station"),
+        ("Elephanta Caves", "UNESCO World Heritage Site"), ("Siddhivinayak Temple", "Temple"),
+    ],
+    "varanasi": [
+        ("Dashashwamedh Ghat", "Ghat"), ("Kashi Vishwanath Temple", "Temple"),
+        ("Assi Ghat", "Ghat"), ("Sarnath", "Historic Buddhist site"),
+        ("Manikarnika Ghat", "Ghat"),
+    ],
+    "goa": [
+        ("Baga Beach", "Beach"), ("Calangute Beach", "Beach"),
+        ("Basilica of Bom Jesus", "UNESCO World Heritage Site"),
+        ("Fort Aguada", "Historic fort"), ("Dudhsagar Falls", "Waterfall"),
+    ],
+    "kolkata": [
+        ("Victoria Memorial", "Museum and monument"), ("Howrah Bridge", "Landmark"),
+        ("Dakshineswar Kali Temple", "Temple"), ("Indian Museum", "Museum"),
+        ("Marble Palace", "Historic mansion"),
+    ],
+    "pune": [
+        ("Shaniwar Wada", "Historic fortification"), ("Aga Khan Palace", "Palace"),
+        ("Sinhagad Fort", "Historic fort"), ("Dagdusheth Halwai Ganpati Temple", "Temple"),
+    ],
+    "kochi": [
+        ("Fort Kochi", "Historic district"), ("Chinese Fishing Nets", "Landmark"),
+        ("Mattancherry Palace", "Palace"), ("Jew Town", "Historic district"),
+    ],
+    "lucknow": [
+        ("Bara Imambara", "Historic monument"), ("Chota Imambara", "Historic monument"),
+        ("Rumi Darwaza", "Landmark"), ("British Residency", "Historic site"),
+    ],
+    "madurai": [
+        ("Meenakshi Amman Temple", "Temple"), ("Thirumalai Nayakkar Palace", "Palace"),
+        ("Gandhi Memorial Museum", "Museum"),
+    ],
+    "amritsar": [
+        ("Golden Temple", "Religious site"), ("Jallianwala Bagh", "Memorial"),
+        ("Partition Museum", "Museum"), ("Wagah Border", "Ceremonial site"),
+    ],
+}
+
+def _offline_places(destination):
+    key = re.sub(r"[^a-z]", "", clean_text(destination).casefold())
+    aliases = {
+        "mysuru": "mysore", "ootacamund": "ooty",
+        "visakhapatnamcity": "visakhapatnam", "vizag": "visakhapatnam",
+        "newdelhi": "delhi", "tirupati": "tirumala",
+    }
+    key = aliases.get(key, key)
+    records = _OFFLINE_ATTRACTIONS.get(key)
+    if not records:
+        # Permit common suffixes such as "Hyderabad, Telangana".
+        for city, values in _OFFLINE_ATTRACTIONS.items():
+            if key.startswith(city) or city.startswith(key):
+                records = values
+                break
+    if not records:
+        return None
+    return {
+        "destination": clean_text(destination),
+        "places": [
+            {
+                "id": f"offline:{key}:{index}",
+                "name": name,
+                "category": category,
+                "latitude": None,
+                "longitude": None,
+                "image": "",
+                "description": f"{name} is a popular attraction in {clean_text(destination)}.",
+                "opening_hours": "",
+                "website": "",
+                "wikipedia_url": None,
+                "map_url": f"https://www.google.com/maps/search/?api=1&query={quote(name + ' ' + clean_text(destination))}",
+                "source": "Curated offline fallback catalogue",
+            }
+            for index, (name, category) in enumerate(records, start=1)
+        ],
+        "source": "Curated offline fallback catalogue",
+        "cached": True,
+    }
+
+
+# Cache successful place searches for 24 hours.
+PLACE_CACHE_TTL = 24 * 60 * 60
+_PLACE_CACHE = {}
+_CACHE_FILE = __import__("pathlib").Path(__file__).resolve().parents[2] / "instance" / "places_cache.json"
+try:
+    if _CACHE_FILE.exists():
+        _PLACE_CACHE.update(__import__("json").loads(_CACHE_FILE.read_text(encoding="utf-8")))
+except Exception as cache_error:
+    print("PLACE CACHE READ ERROR:", cache_error)
+
+def _persist_place_cache():
+    try:
+        _CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        temp = _CACHE_FILE.with_suffix(".tmp")
+        temp.write_text(__import__("json").dumps(_PLACE_CACHE, ensure_ascii=False), encoding="utf-8")
+        temp.replace(_CACHE_FILE)
+    except Exception as cache_error:
+        print("PLACE CACHE WRITE ERROR:", cache_error)
+
+
+
+def search_places(destination):
+    """Return cached places when available and fall back to
+    cached results if OpenStreetMap temporarily fails.
+    """
+    destination = clean_text(destination)
+
+    if not destination:
+        raise ValueError("Please provide a destination.")
+
+    cache_key = destination.casefold()
+    now = time.time()
+
+    # For supported Indian cities, return the curated catalogue immediately.
+    # This avoids repeated Nominatim/Overpass outages blocking the planning page.
+    instant_fallback = _offline_places(destination)
+    if instant_fallback:
+        cached_now = _PLACE_CACHE.get(cache_key)
+        if cached_now and now - cached_now.get("saved_at", 0) < PLACE_CACHE_TTL:
+            return deepcopy(cached_now["result"])
+        _PLACE_CACHE[cache_key] = {
+            "saved_at": now,
+            "result": deepcopy(instant_fallback),
+        }
+        _persist_place_cache()
+        print(f"INSTANT OFFLINE PLACE CATALOGUE: {destination}")
+        return instant_fallback
+
+    cached = _PLACE_CACHE.get(cache_key)
+
+    # Use fresh cached results without contacting external APIs.
+    if cached and now - cached["saved_at"] < PLACE_CACHE_TTL:
+        print(f"PLACE CACHE HIT: {destination}")
+        return deepcopy(cached["result"])
+
+    try:
+        result = _search_places_uncached(destination)
+
+        # If OSM has no mapped attractions, prefer the offline catalogue
+        # over caching an empty result for the user.
+        if not result.get("places"):
+            fallback = _offline_places(destination)
+            if fallback:
+                result = fallback
+
+        # Cache successful results.
+        _PLACE_CACHE[cache_key] = {
+            "saved_at": time.time(),
+            "result": deepcopy(result),
+        }
+
+        _persist_place_cache()
+        print(f"PLACE CACHE UPDATED: {destination}")
+        return result
+
+    except Exception as error:
+        # If the external services fail, reuse older cached results.
+        if cached:
+            print(
+                f"PLACE CACHE FALLBACK: {destination}. "
+                f"External search failed: {error}"
+            )
+            return deepcopy(cached["result"])
+
+        # No previous results: use a curated offline fallback for supported
+        # Indian destinations instead of showing an empty error panel.
+        fallback = _offline_places(destination)
+        if fallback:
+            _PLACE_CACHE[cache_key] = {
+                "saved_at": time.time(),
+                "result": deepcopy(fallback),
+            }
+            _persist_place_cache()
+            print(f"OFFLINE PLACE FALLBACK: {destination}")
+            return fallback
+        raise
+
+
+
+def get_place_details(place_id):
+    match = re.fullmatch(
+        r"(node|way|relation)/(\d+)",
+        clean_text(place_id)
+    )
+
+    if not match:
+        raise ValueError("Invalid place identifier.")
+
+    osm_type, osm_id = match.groups()
+
+    query = f"""
+    [out:json][timeout:15];
+    {osm_type}({osm_id});
+    out center tags;
+    """
+
+    result = get_overpass_data(query, timeout=20)
+    elements = result.get("elements", [])
+
+    if not elements:
+        raise LookupError("This place could not be found.")
+
+    element = elements[0]
+    tags = element.get("tags") or {}
+
+    name = clean_text(tags.get("name") or tags.get("name:en"))
+
+    wikipedia_title = tags.get("wikipedia", "")
+
+    if wikipedia_title.lower().startswith("en:"):
+        wikipedia_title = wikipedia_title[3:]
+
+    wiki = wikipedia_information(wikipedia_title)
+
+    center = element.get("center") or {}
+
+    latitude = element.get("lat", center.get("lat"))
+    longitude = element.get("lon", center.get("lon"))
+
+    category = (
+        tags.get("tourism")
+        or tags.get("historic")
+        or tags.get("amenity")
+        or tags.get("leisure")
+        or tags.get("natural")
+        or "Place"
+    ).replace("_", " ").title()
+
+    return {
+        "id": place_id,
+        "name": name,
+        "category": category,
+        "description": (
+            wiki.get("description")
+            or clean_text(tags.get("description"))
+        ),
+        "image": tags.get("image") or wiki.get("image"),
+        "opening_hours": clean_text(tags.get("opening_hours")),
+        "website": tags.get("website") or tags.get("contact:website"),
+        "wikipedia_url": wiki.get("wikipedia_url"),
+        "latitude": latitude,
+        "longitude": longitude,
+        "map_url": (
+            "https://www.openstreetmap.org/"
+            f"?mlat={latitude}&mlon={longitude}"
+            if latitude is not None and longitude is not None
+            else None
+        ),
+        "history": (
+            "No verified historical information was available "
+            "from the connected sources."
+        ),
+        "source": "OpenStreetMap contributors",
+    }

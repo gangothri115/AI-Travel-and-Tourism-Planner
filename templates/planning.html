@@ -1,0 +1,561 @@
+{% extends "base.html" %}
+
+{% block title %}
+AI Travel Planner
+{% endblock %}
+
+
+{% block content %}
+
+<div class="travel-dashboard">
+
+    <div class="planning-container">
+
+        <!-- BACK BUTTON -->
+
+        <a href="/chat" class="back-button">
+            ← Back
+        </a>
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="planning-header">
+
+            <div class="planning-logo">
+                🗺️
+            </div>
+
+            <div>
+
+                <div class="small-title">
+                    AI TRAVEL & TOURISM
+                </div>
+
+                <h1>
+                    Your AI Travel Plan
+                </h1>
+
+                <p>
+                    Your journey, intelligently planned.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- THREE TABS -->
+
+        <div class="planning-tabs">
+
+            <button
+                class="planning-tab active"
+                data-tab="summary"
+                type="button"
+            >
+
+                <span class="tab-icon">
+                    📋
+                </span>
+
+                <span class="tab-text">
+
+                    <strong>
+                        Summary
+                    </strong>
+
+                    <small>
+                        Trip & Places
+                    </small>
+
+                </span>
+
+            </button>
+
+
+            <button
+                class="planning-tab"
+                data-tab="weather"
+                type="button"
+            >
+
+                <span class="tab-icon">
+                    🌦️
+                </span>
+
+                <span class="tab-text">
+
+                    <strong>
+                        Weather
+                    </strong>
+
+                    <small>
+                        Conditions & Forecast
+                    </small>
+
+                </span>
+
+            </button>
+
+
+            <button
+                class="planning-tab"
+                data-tab="routes"
+                type="button"
+            >
+
+                <span class="tab-icon">
+                    🗺️
+                </span>
+
+                <span class="tab-text">
+
+                    <strong>
+                        Routes
+                    </strong>
+
+                    <small>
+                        Available Options
+                    </small>
+
+                </span>
+
+            </button>
+
+        </div>
+
+
+
+        <!-- =================================================
+             SUMMARY
+        ================================================== -->
+
+        <section
+            id="summary-section"
+            class="tab-section active"
+        >
+
+            <div class="planning-card">
+
+                <div class="section-title">
+
+                    <div class="section-icon">
+                        📋
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Trip Summary
+                        </h2>
+
+                        <p>
+                            Click any detail to modify it
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="summary-grid">
+
+
+                    <div
+                        class="summary-item editable"
+                        data-field="from_location"
+                    >
+
+                        <span>📍</span>
+
+                        <div>
+
+                            <small>
+                                FROM
+                            </small>
+
+                            <strong id="fromLocation">
+                                Not specified
+                            </strong>
+
+                        </div>
+
+                        <span class="edit-icon">
+                            ✎
+                        </span>
+
+                    </div>
+
+
+
+                    <div
+                        class="summary-item editable"
+                        data-field="destination"
+                    >
+
+                        <span>🎯</span>
+
+                        <div>
+
+                            <small>
+                                DESTINATION
+                            </small>
+
+                            <strong id="destination">
+                                Not specified
+                            </strong>
+
+                        </div>
+
+                        <span class="edit-icon">
+                            ✎
+                        </span>
+
+                    </div>
+
+
+
+                    <div
+                        class="summary-item editable"
+                        data-field="days"
+                    >
+
+                        <span>📅</span>
+
+                        <div>
+
+                            <small>
+                                DURATION
+                            </small>
+
+                            <strong id="tripDays">
+                                AI estimated
+                            </strong>
+
+                        </div>
+
+                        <span class="edit-icon">
+                            ✎
+                        </span>
+
+                    </div>
+
+
+
+                    <div
+                        class="summary-item editable"
+                        data-field="transport"
+                    >
+
+                        <span>🚗</span>
+
+                        <div>
+
+                            <small>
+                                TRANSPORT
+                            </small>
+
+                            <strong id="transport">
+                                AI suggested
+                            </strong>
+
+                        </div>
+
+                        <span class="edit-icon">
+                            ✎
+                        </span>
+
+                    </div>
+
+
+
+                    <div
+                        class="summary-item editable"
+                        data-field="budget"
+                    >
+
+                        <span>💰</span>
+
+                        <div>
+
+                            <small>
+                                BUDGET
+                            </small>
+
+                            <strong id="budget">
+                                Flexible
+                            </strong>
+
+                        </div>
+
+                        <span class="edit-icon">
+                            ✎
+                        </span>
+
+                    </div>
+
+
+
+                    <div
+                        class="summary-item editable"
+                        data-field="travellers"
+                    >
+
+                        <span>👥</span>
+
+                        <div>
+
+                            <small>
+                                TRAVELLERS
+                            </small>
+
+                            <strong id="travellers">
+                                Not specified
+                            </strong>
+
+                        </div>
+
+                        <span class="edit-icon">
+                            ✎
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PLACES -->
+
+            <div class="planning-card">
+
+                <div class="section-title">
+
+                    <div class="section-icon">
+                        🏞️
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Places to Explore
+                        </h2>
+
+                        <p>
+                            Discover places at your destination
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="placesGrid"
+                    class="places-grid"
+                ></div>
+
+                <div class="manual-place-panel">
+                    <h3>＋ Add your own place</h3>
+                    <p>Add a landmark or attraction that is not in the suggestions.</p>
+                    <div class="manual-place-form">
+                        <input id="manualPlaceName" type="text" placeholder="Enter place name (e.g. Taj Mahal)" maxlength="120">
+                        <input id="manualPlaceNotes" type="text" placeholder="Optional note" maxlength="240">
+                        <button id="addManualPlace" type="button">Add to my trip</button>
+                    </div>
+                    <p id="manualPlaceStatus" role="status"></p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             WEATHER
+        ================================================== -->
+
+        <section
+            id="weather-section"
+            class="tab-section"
+        >
+
+            <div class="planning-card">
+
+                <div class="section-title">
+
+                    <div class="section-icon">
+                        🌦️
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Weather & Climate
+                        </h2>
+
+                        <p>
+                            Current conditions and trip forecast
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="current-weather">
+
+                    <div class="weather-icon">
+                        🌤️
+                    </div>
+
+                    <div class="weather-information">
+
+                        <small>
+                            CURRENT CONDITIONS
+                        </small>
+
+                        <h2>
+                            Weather information
+                        </h2>
+
+                        <p>
+                            Weather information for your destination
+                            will appear here.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="forecast-heading">
+
+                    <h3>
+                        📅 Weather During Your Trip
+                    </h3>
+
+                    <p>
+                        Forecast for each day of your journey
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="weatherGrid"
+                    class="weather-grid"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             ROUTES
+        ================================================== -->
+
+        <section
+            id="routes-section"
+            class="tab-section"
+        >
+
+            <div class="planning-card">
+
+                <div class="section-title">
+
+                    <div class="section-icon">
+                        🗺️
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Available Routes
+                        </h2>
+
+                        <p>
+                            Compare available travel options
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="routesGrid"
+                    class="routes-grid"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ACTIONS -->
+
+        <div class="planning-actions">
+            <button id="generateItinerary" class="modify-button" type="button">✨ Generate my day-by-day trip plan</button>
+
+            <button
+                class="modify-button"
+                type="button"
+                onclick="window.location.href='/chat'"
+            >
+                ← Modify Trip
+            </button>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- CSS -->
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/main.css') }}"
+>
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/planning.css') }}"
+>
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/place-details.css') }}?v=1"
+>
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/places.css') }}?v=3"
+>
+
+
+
+<!-- Load planner functionality -->
+<script
+    src="{{ url_for('static', filename='js/planning.js') }}?v=30"
+    defer
+></script>
+
+<!-- Load real tourist-place search -->
+<script
+    src="{{ url_for('static', filename='js/places.js') }}?v=30"
+    defer
+></script>
+
+
+{% endblock %}
